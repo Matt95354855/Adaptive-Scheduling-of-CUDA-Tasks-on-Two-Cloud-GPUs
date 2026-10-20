@@ -7,7 +7,7 @@ Il s'agit d'un pilote de diagnostic sur une seule instance, avec trois répétit
 ## Instance et reproductibilité
 
 - RunPod, pod `wtd0haxfn39yuy`, deux NVIDIA RTX PRO 4000 Blackwell identiques, environ 24 Go de VRAM par GPU, 24 vCPU AMD EPYC 7352 et 62 Go de RAM selon l'interface.
-- Tarif affiché : 1,14 $/h pour les deux GPU. Le solde affiché est passé de 8,19 $ avant le démarrage à 8,04 $ lors du dernier relevé, soit environ 0,15 $ débités à cet instant. Ce relevé n'est pas une facture finale.
+- Tarif affiché : 1,14 $/h pour les deux GPU. Le solde affiché est passé de 8,19 $ avant le démarrage à 7,94 $ après l'arrêt, soit 0,25 $ de différence visible, sous le plafond de 2 $. L'interface indique désormais 0,00 $/h pour le pod arrêté. Ce relevé de solde n'est pas une facture détaillée.
 - Pilote NVIDIA 595.91.07 ; `nvidia-smi` annonce CUDA 13.2 ; toolkit `nvcc` 12.8.93 ; Python 3.12.3 ; PyTorch 2.8.0+cu128 avec runtime CUDA 12.8.
 - Les deux GPU sont visibles dans PyTorch. `nvidia-smi topo -m` indique `PHB` entre eux, sans lien NVLink affiché. Les deux lignes annoncent la même affinité CPU `0-47` et NUMA `0`.
 - Le test PyTorch déterministe a produit des résultats conformes sur toutes les cellules. La vérification porte sur la somme analytique d'une multiplication de matrices constantes, tolérance relative `1e-4` ; ce n'est pas une validation élément par élément.
