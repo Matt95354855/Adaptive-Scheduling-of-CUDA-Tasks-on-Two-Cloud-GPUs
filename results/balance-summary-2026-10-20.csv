@@ -1,0 +1,13 @@
+workload,policy,n_runs,n3_imbalance_ratio,event_imbalance_ms,max_gpu_event_ms,gpu0_tasks,gpu1_tasks
+compute,calibrated,24,1.055,0.897,23.782,12.0,12.0
+compute,feedback,24,1.083,1.878,24.219,12.0,12.0
+compute,round_robin,24,1.392,6.977,26.827,12.0,12.0
+compute,single,24,nan,46.410,46.410,24.0,0.0
+compute,size_fifo,24,1.055,0.997,23.882,12.0,12.0
+compute,size_lpt,24,1.000,0.089,23.390,12.0,12.0
+micro,calibrated,24,1.174,0.073,1.476,16.0,16.0
+micro,feedback,24,1.312,0.180,1.539,16.0,16.0
+micro,round_robin,24,1.312,0.148,1.503,16.0,16.0
+micro,single,24,nan,2.657,2.657,32.0,0.0
+micro,size_fifo,24,1.018,0.145,1.516,17.0,15.0
+micro,size_lpt,24,1.000,0.048,1.451,16.0,16.0
