@@ -1,0 +1,9 @@
+# Two-GPU pilot protocol
+
+This first pilot tests independent, GPU-resident float32 GEMM tasks. It is a diagnostic and correctness exercise, not a validated performance claim. The workload uses a fixed seed and the same ordered task list for every policy. Outputs are checked against an analytic matrix-product sum.
+
+Policies: one GPU (all tasks on GPU 0), two-GPU round robin (fixed alternating assignment), and two-GPU adaptive (dispatch next task to whichever GPU completes first). In this pilot, “adaptive” means completion-feedback scheduling only; it does not model transfer cost, memory pressure or per-GPU performance. Each policy starts fresh worker processes and warms up before timing. Process creation and warm-up are outside the batch clock. Task allocations and result checks occur inside each worker, but the CUDA event encloses only `torch.mm`.
+
+Run `bash experiments/diagnose.sh`, then `python experiments/pilot.py --smoke --out results/smoke.json`. If the smoke test succeeds, run `python experiments/pilot.py --repetitions 3 --out results/pilot.json`. A short Nsight Systems profile can be captured with `nsys profile --trace=cuda,nvtx --sample=none --force-overwrite=true -o results/nsight-smoke python experiments/pilot.py --smoke --out results/nsight-smoke.json`. Record any profiler failure exactly; do not infer kernel behavior from a failed capture.
+
+The first run's measurements are diagnostic. For valid comparisons, inspect GPU topology, software versions, task-level CUDA event times, host makespan, and variation across repeats. Do not claim improvement based on one short run. This workload has no host-to-device or device-to-device copies by design, so it cannot test transfer-aware scheduling. The simple “adaptive” policy may have longer host gaps because it waits for completion messages; that overhead is part of the measured makespan.
