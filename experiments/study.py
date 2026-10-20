@@ -12,7 +12,8 @@ from pathlib import Path
 
 POLICIES = ("single", "round_robin", "size_fifo", "size_lpt", "calibrated", "feedback")
 SIZES = {"micro": [256, 512, 768, 1024] * 8,
-         "compute": [1024, 2048, 3072, 4096] * 6}
+         "compute": [1024, 2048, 3072, 4096] * 6,
+         "hidden": [3072] * 24}
 
 
 def plan(policy, tasks, calibration):
@@ -66,7 +67,8 @@ def worker(gpu, requests, replies, sizes, resident):
         task = requests.get()
         if task is None:
             return
-        task_id, n, seed = task
+        task_id, n, seed, *extra = task
+        repeats = extra[0] if extra else 1
         start_ns = time.monotonic_ns()
         scale = 1.0 if resident else ((seed % 7) + 1) / 8.0
         if resident:
@@ -78,17 +80,18 @@ def worker(gpu, requests, replies, sizes, resident):
         begin, end = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
         torch.cuda.nvtx.range_push(f"task_{task_id}_n{n}_gpu{gpu}")
         begin.record()
-        if resident:
-            torch.mm(a, b, out=c)
-        else:
-            c = torch.mm(a, b)
+        for _ in range(repeats):
+            if resident:
+                torch.mm(a, b, out=c)
+            else:
+                c = torch.mm(a, b)
         end.record()
         end.synchronize()
         torch.cuda.nvtx.range_pop()
         actual = float(c.sum().item())
         finish_ns = time.monotonic_ns()
         expected = scale * n ** 3
-        replies.put({"kind": "done", "id": task_id, "n": n, "gpu": gpu,
+        replies.put({"kind": "done", "id": task_id, "n": n, "repeats": repeats, "gpu": gpu,
                      "start_ns": start_ns, "finish_ns": finish_ns,
                      "gpu_ms": begin.elapsed_time(end),
                      "correct": abs(actual - expected) <= max(1.0, expected * 1e-4)})
@@ -99,7 +102,7 @@ def run(policy, tasks, resident=False):
     requests = [ctx.Queue() for _ in range(2)]
     replies = ctx.Queue()
     processes = [ctx.Process(target=worker, args=(g, requests[g], replies,
-                                                sorted({n for _, n, _ in tasks}), resident)) for g in range(2)]
+                                                sorted({task[1] for task in tasks}), resident)) for g in range(2)]
     for process in processes:
         process.start()
     try:
@@ -109,7 +112,7 @@ def run(policy, tasks, resident=False):
             if msg["kind"] != "ready":
                 raise RuntimeError(msg)
             calibration[msg["gpu"]] = msg["calibration"]
-        assignment = plan(policy, [(i, n) for i, n, _ in tasks], calibration)
+        assignment = plan(policy, [(task[0], task[1]) for task in tasks], calibration)
         sent, completed, dispatch_ns, dispatch_times = 0, [], 0, {}
         begin_ns = time.monotonic_ns()
 
@@ -202,7 +205,12 @@ def main():
     for seed in range(args.seed_start, args.seed_start + args.seeds):
         sizes = SIZES[args.workload].copy()
         random.Random(seed).shuffle(sizes)
-        tasks = [(i, n, seed + i) for i, n in enumerate(sizes)]
+        if args.workload == "hidden":
+            repeats = [12] * 8 + [1] * 16
+            random.Random(seed ^ 0x5A17).shuffle(repeats)
+            tasks = [(i, n, seed + i, repeats[i]) for i, n in enumerate(sizes)]
+        else:
+            tasks = [(i, n, seed + i) for i, n in enumerate(sizes)]
         for repetition in range(args.rep_start, args.rep_start + args.repetitions):
             order = list(args.policies)
             random.Random(seed * 1009 + repetition).shuffle(order)
