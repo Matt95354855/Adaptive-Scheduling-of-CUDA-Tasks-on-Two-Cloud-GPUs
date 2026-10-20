@@ -1,0 +1,13 @@
+workload,policy,n_runs,makespan_ms,worker_gap_sum_ms,gpu_event_sum_ms,queue_wait_median_ms,reply_delay_median_ms
+compute,calibrated,24,48.240,0.756,46.663,31.472,0.220
+compute,feedback,24,51.922,8.515,46.646,0.137,0.222
+compute,round_robin,24,52.148,0.768,46.674,30.461,0.221
+compute,single,24,73.590,0.778,46.410,43.380,0.210
+compute,size_fifo,24,48.300,0.790,46.649,31.335,0.223
+compute,size_lpt,24,48.068,0.805,46.714,31.555,0.220
+micro,calibrated,24,25.764,1.187,2.892,21.700,0.187
+micro,feedback,24,29.371,10.053,2.851,0.134,0.166
+micro,round_robin,24,25.699,1.254,2.872,21.548,0.173
+micro,single,24,29.267,1.286,2.657,23.834,0.156
+micro,size_fifo,24,25.845,1.265,2.886,21.589,0.170
+micro,size_lpt,24,25.574,1.199,2.861,21.515,0.187
