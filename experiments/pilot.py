@@ -5,6 +5,7 @@ import json
 import multiprocessing as mp
 import os
 import queue
+import random
 import statistics
 import time
 from pathlib import Path
@@ -118,6 +119,7 @@ def main():
     parser.add_argument("--repetitions", type=int, default=3)
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--workload", choices=["micro", "compute"], default="micro")
+    parser.add_argument("--shuffle", action="store_true", help="Shuffle task sizes with the recorded seed")
     args = parser.parse_args()
     import torch
 
@@ -129,9 +131,12 @@ def main():
         sizes = [1024, 2048, 3072, 4096] * 6
     else:
         sizes = [256, 512, 1024, 768] * 8
+    if args.shuffle:
+        random.Random(args.seed).shuffle(sizes)
     tasks = [(i, n, args.seed + i) for i, n in enumerate(sizes)]
     policies = ["single", "round_robin", "adaptive"]
     output = {"schema_version": 1, "seed": args.seed, "workload": args.workload,
+              "shuffle": args.shuffle,
               "sizes": sizes,
               "torch": torch.__version__, "cuda_runtime": torch.version.cuda,
               "gpus": [torch.cuda.get_device_name(i) for i in range(2)],
