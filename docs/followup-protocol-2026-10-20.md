@@ -9,6 +9,7 @@ Pour des tâches GEMM indépendantes déjà résidentes sur deux GPU identiques,
 - **Calcul** : 24 tâches, six exemplaires de chacune des tailles 1024, 2048, 3072, 4096. Douze permutations produites par `random.Random(seed).shuffle`, seeds 100 à 111. Deux répétitions initiales par seed et politique. Le script randomise l'ordre des six politiques dans chaque bloc `(seed, répétition)` avec `random.Random(seed * 1009 + répétition)`.
 - **Petites tâches avec allocations** : 32 tâches, huit exemplaires de 256, 512, 768, 1024. Seeds 200 à 211, deux répétitions et six politiques, avec la même randomisation de l'ordre.
 - **Petites tâches préallouées** : mêmes seeds, tailles et répétitions, mais seuls `single`, `round_robin`, `feedback`. Chaque worker réutilise les opérandes et le tampon de sortie par taille. Ce contrôle retire les allocations par tâche ; la validation et les échanges avec les workers restent dans la fenêtre mesurée. Les valeurs des matrices deviennent constantes à 1, ce qui garde le même GEMM mais change la donnée numérique : comparer les temps de façon descriptive, sans attribuer tout écart aux allocations seules.
+- **Coût de tâche caché** : 24 tâches de même taille 3072 ; huit répètent le GEMM 12 fois et seize l'exécutent une fois. La répartition des répétitions est mélangée par `random.Random(seed ^ 0x5A17)` pour les seeds 300 à 311, avant tout chronométrage de cette série. Les ordonnanceurs statiques ne voient que `n`, tandis que le worker reçoit aussi le nombre de répétitions. Deux répétitions par seed, quatre politiques (`single`, `round_robin`, `size_lpt`, `feedback`). Cette charge synthétique teste le cas où la durée n'est pas prédictible à partir des métadonnées visibles. Elle n'implique pas que les applications réelles aient cette distribution.
 - Un bloc complémentaire de répétition du calcul peut être lancé si les deux premières répétitions exposent des valeurs extrêmes. Il sera identifié séparément dans les résultats : il est motivé par les données observées et ne faisait pas partie du plan initial.
 
 ## Politiques
@@ -36,6 +37,7 @@ Le JSON brut enregistre, pour chaque tâche, l'heure de dépôt, de début et de
 python experiments/study.py --out results/compute.json --seeds 12 --repetitions 2
 python experiments/study.py --out results/micro.json --workload micro --seed-start 200 --seeds 12 --repetitions 2
 python experiments/study.py --out results/resident.json --workload micro --resident --seed-start 200 --seeds 12 --repetitions 2 --policies single round_robin feedback
+python experiments/study.py --out results/hidden.json --workload hidden --seed-start 300 --seeds 12 --repetitions 2 --policies single round_robin size_lpt feedback
 python experiments/analyze.py results/compute.csv
 python experiments/task_metrics.py results/compute.json results/compute-derived.csv
 python experiments/summarize_metrics.py results/compute-derived.csv
