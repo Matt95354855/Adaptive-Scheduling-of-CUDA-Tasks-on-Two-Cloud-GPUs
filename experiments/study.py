@@ -185,6 +185,7 @@ def main():
     parser.add_argument("--seed-start", type=int, default=100)
     parser.add_argument("--seeds", type=int, default=12)
     parser.add_argument("--repetitions", type=int, default=2)
+    parser.add_argument("--rep-start", type=int, default=0, help="Repetition index offset for follow-up blocks")
     parser.add_argument("--policies", nargs="+", choices=POLICIES, default=POLICIES)
     parser.add_argument("--resident", action="store_true", help="Preallocate operands and output per size")
     args = parser.parse_args()
@@ -193,7 +194,8 @@ def main():
         raise RuntimeError("Two CUDA GPUs required")
     data = {"schema_version": 2, "workload": args.workload,
             "mode": "resident" if args.resident else "allocating", "seed_start": args.seed_start,
-            "seed_count": args.seeds, "repetitions": args.repetitions,
+            "seed_count": args.seeds, "rep_start": args.rep_start,
+            "repetitions": args.repetitions,
             "gpus": [torch.cuda.get_device_name(g) for g in range(2)],
             "torch": torch.__version__, "cuda_runtime": torch.version.cuda,
             "runs": []}
@@ -201,7 +203,7 @@ def main():
         sizes = SIZES[args.workload].copy()
         random.Random(seed).shuffle(sizes)
         tasks = [(i, n, seed + i) for i, n in enumerate(sizes)]
-        for repetition in range(args.repetitions):
+        for repetition in range(args.rep_start, args.rep_start + args.repetitions):
             order = list(args.policies)
             random.Random(seed * 1009 + repetition).shuffle(order)
             for index, policy in enumerate(order):
