@@ -117,15 +117,22 @@ def main():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--repetitions", type=int, default=3)
     parser.add_argument("--smoke", action="store_true")
+    parser.add_argument("--workload", choices=["micro", "compute"], default="micro")
     args = parser.parse_args()
     import torch
 
     if torch.cuda.device_count() < 2:
         raise RuntimeError("Two CUDA GPUs are required")
-    sizes = [256, 512, 1024, 256, 768, 512, 1024, 256] if args.smoke else [256, 512, 1024, 768] * 8
+    if args.smoke:
+        sizes = [256, 512, 1024, 256, 768, 512, 1024, 256]
+    elif args.workload == "compute":
+        sizes = [1024, 2048, 3072, 4096] * 6
+    else:
+        sizes = [256, 512, 1024, 768] * 8
     tasks = [(i, n, args.seed + i) for i, n in enumerate(sizes)]
     policies = ["single", "round_robin", "adaptive"]
-    output = {"schema_version": 1, "seed": args.seed, "sizes": sizes,
+    output = {"schema_version": 1, "seed": args.seed, "workload": args.workload,
+              "sizes": sizes,
               "torch": torch.__version__, "cuda_runtime": torch.version.cuda,
               "gpus": [torch.cuda.get_device_name(i) for i in range(2)],
               "note": "GPU-resident GEMM; no H2D/D2D transfers. Pilot, not final evidence.",
