@@ -5,6 +5,7 @@ import csv
 import random
 import statistics
 from collections import defaultdict
+from pathlib import Path
 
 
 def median(values):
@@ -21,7 +22,16 @@ def bootstrap_ci(values, draws=10000, seed=7):
 
 def analyze(path):
     with open(path, newline="") as file:
-        rows = list(csv.DictReader(file))
+        source = list(csv.DictReader(file))
+    if "policy" in source[0]:
+        rows = source
+    else:
+        workload = Path(path).name.split("-")[0]
+        rows = [{"workload": workload, "seed": row["seed"],
+                 "repetition": row["rep"], "policy": policy,
+                 "makespan_ms": row[policy]}
+                for row in source for policy in source[0]
+                if policy not in ("seed", "rep")]
     cells = defaultdict(list)
     for row in rows:
         cells[(row["workload"], int(row["seed"]), row["policy"])].append(float(row["makespan_ms"]))
