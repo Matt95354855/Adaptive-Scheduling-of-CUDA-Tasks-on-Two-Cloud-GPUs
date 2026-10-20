@@ -1,42 +1,31 @@
-# Adaptive-Scheduling-of-CUDA-Tasks-on-Two-Cloud-GPUs
-This project evaluates scheduling strategies for independent CUDA tasks across two cloud GPUs. It compares single-GPU, static, dynamic, and adaptive scheduling, measuring runtime, throughput, transfer overhead, variability, and estimated cost.
+# Adaptive Scheduling of CUDA Tasks on Two Cloud GPUs
 
+This repository studies how independent CUDA tasks are assigned to two cloud GPUs. The current implementation is a **research pilot**, not a demonstrated general-purpose scheduler. It compares one GPU, fixed round-robin assignment, and a completion-feedback policy that sends the next task to the first available GPU.
 
+## Pilot completed on 20 October 2026
 
+Two NVIDIA RTX PRO 4000 Blackwell GPUs were tested on RunPod with a spending cap of $2. The short pilot found that the feedback policy helped on task orders that left round-robin imbalanced, while round-robin was better on a deliberately balanced order and on very small tasks. All checked output sums passed. These results are limited to one instance and three repetitions per cell.
 
-# Two-GPU CUDA Task Scheduling in the Cloud
+- [Full observations and limitations](docs/observations-2026-10-20.md)
+- [Individual run summary (CSV)](results/pilot-summary-2026-10-20.csv)
+- [Reproduction protocol](docs/protocol.md)
+- [Benchmark code](experiments/pilot.py) and [system diagnostic](experiments/diagnose.sh)
 
-This research project investigates how independent CUDA tasks can be scheduled across two cloud-based NVIDIA GPUs. It compares scheduling strategies to measure their effects on execution time, throughput, data-transfer overhead, performance variability, and estimated cost.
+Nsight Systems 2025.1.1 captured CUDA and NVTX activity during the smoke test. The binary trace and per-task JSON files were stored on a pod without persistent storage and are not included here. The CSV preserves the run-level observations. No host-to-device or inter-GPU transfer was tested; transfer-aware scheduling remains future work.
 
-## Research goal
+## Quick start
 
-Evaluate whether using two rented GPUs improves the performance and cost-efficiency of parallel CUDA workloads compared with running them on a single GPU.
+Requires Python with CUDA-enabled PyTorch and two visible NVIDIA GPUs.
 
-## Scheduling strategies
+```bash
+bash experiments/diagnose.sh
+python experiments/pilot.py --smoke --out results/smoke.json
+python experiments/pilot.py --repetitions 3 --out results/pilot.json
+python experiments/pilot.py --workload compute --shuffle --seed 43 --repetitions 3 --out results/compute-shuffled.json
+```
 
-- **Single-GPU execution** as a baseline
-- **Static scheduling**, assigning tasks to GPUs in advance
-- **Dynamic scheduling**, assigning tasks as GPUs become available
-- **Adaptive scheduling**, adjusting assignments based on observed performance
+See the protocol for the balanced control and Nsight command. This code is designed for short, reproducible pilot runs. It is not yet a transfer-cost model, DAG scheduler, or production runtime.
 
-## Evaluation metrics
+## License
 
-- Total execution time
-- Throughput
-- GPU utilization
-- Data-transfer and scheduling overhead
-- Performance variability across repeated runs
-- Estimated cloud GPU cost
-
-## Experimental setup
-
-Experiments will use cloud-rented NVIDIA GPUs and workloads composed of independent CUDA tasks. GPU models, workload configurations, software versions, and measurement procedures will be documented to support reproducibility.
-
-## Repository structure
-
-```text
-├── src/             # CUDA workloads and scheduling implementations
-├── experiments/     # Experiment configurations and scripts
-├── results/         # Measurements and analysis
-├── docs/            # Research notes and paper materials
-└── README.md
+MIT; see [LICENSE](LICENSE).
