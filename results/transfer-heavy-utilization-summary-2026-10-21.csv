@@ -1,0 +1,4 @@
+scope,gpu,max_utilization_pct,samples_at_least_90pct
+mixed_single_and_round_robin,0,100,25
+mixed_single_and_round_robin,1,100,8
+simultaneous_samples,0_and_1,100,5
