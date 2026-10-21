@@ -16,7 +16,10 @@ SIZES = {"micro": [256, 512, 768, 1024] * 8,
          "hidden": [3072] * 24,
          # Independent tasks whose operands are created in pinned host memory
          # and copied to the selected GPU inside the measured window.
-         "transfer": [1024, 1536, 2048] * 8}
+         "transfer": [1024, 1536, 2048] * 8,
+         # A sustained transfer-plus-compute workload.  Larger matrices and
+         # repeated GEMMs make device utilization observable at batch level.
+         "transfer_heavy": [4096, 5120, 6144] * 4}
 
 
 def plan(policy, tasks, calibration):
@@ -221,7 +224,7 @@ def run(policy, tasks, resident=False, transfer=False, reuse_pinned_inputs=False
 def write_outputs(data, path):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, separators=(",", ":")) + "\n")
-    fields = ("workload", "mode", "task_count", "seed", "repetition", "order", "policy", "makespan_ms", "dispatch_ms",
+    fields = ("workload", "mode", "task_count", "gemm_repeats", "seed", "repetition", "order", "policy", "makespan_ms", "dispatch_ms",
               "gpu0_tasks", "gpu1_tasks", "gpu0_n3", "gpu1_n3", "gpu0_event_ms", "gpu1_event_ms",
               "gpu0_h2d_ms", "gpu1_h2d_ms", "input_prepare_ms_median", "host_task_ms_median")
     with path.with_suffix(".csv").open("w", newline="") as file:
@@ -245,22 +248,28 @@ def main():
                         help="For transfer: reuse pinned host inputs while retaining H2D copies")
     parser.add_argument("--transfer-tasks", type=int, default=None,
                         help="For transfer: number of tasks, divisible by three (default: 24)")
+    parser.add_argument("--gemm-repeats", type=int, default=1,
+                        help="Repeat each transfer GEMM this many times after its H2D copy")
     args = parser.parse_args()
-    if args.resident and args.workload == "transfer":
-        raise ValueError("--resident cannot be combined with the transfer workload")
-    if args.reuse_pinned_inputs and args.workload != "transfer":
-        raise ValueError("--reuse-pinned-inputs requires the transfer workload")
+    is_transfer = args.workload.startswith("transfer")
+    if args.resident and is_transfer:
+        raise ValueError("--resident cannot be combined with a transfer workload")
+    if args.reuse_pinned_inputs and not is_transfer:
+        raise ValueError("--reuse-pinned-inputs requires a transfer workload")
     if args.transfer_tasks is not None:
-        if args.workload != "transfer" or args.transfer_tasks < 3 or args.transfer_tasks % 3:
-            raise ValueError("--transfer-tasks requires transfer and a positive multiple of three")
+        if not is_transfer or args.transfer_tasks < 3 or args.transfer_tasks % 3:
+            raise ValueError("--transfer-tasks requires a transfer workload and a positive multiple of three")
+    if args.gemm_repeats < 1:
+        raise ValueError("--gemm-repeats must be positive")
     import torch
     if torch.cuda.device_count() < 2:
         raise RuntimeError("Two CUDA GPUs required")
     mode = ("resident" if args.resident else
             ("host_to_device_reused_pinned" if args.reuse_pinned_inputs else
-             ("host_to_device" if args.workload == "transfer" else "allocating")))
+             ("host_to_device" if is_transfer else "allocating")))
     task_count = args.transfer_tasks or len(SIZES[args.workload])
     data = {"schema_version": 4, "workload": args.workload, "task_count": task_count,
+            "gemm_repeats": args.gemm_repeats,
             "mode": mode, "seed_start": args.seed_start,
             "seed_count": args.seeds, "rep_start": args.rep_start,
             "repetitions": args.repetitions,
@@ -270,12 +279,15 @@ def main():
     for seed in range(args.seed_start, args.seed_start + args.seeds):
         sizes = SIZES[args.workload].copy()
         if args.transfer_tasks is not None:
-            sizes = [1024, 1536, 2048] * (args.transfer_tasks // 3)
+            base_sizes = [4096, 5120, 6144] if args.workload == "transfer_heavy" else [1024, 1536, 2048]
+            sizes = base_sizes * (args.transfer_tasks // 3)
         random.Random(seed).shuffle(sizes)
         if args.workload == "hidden":
             repeats = [12] * 8 + [1] * 16
             random.Random(seed ^ 0x5A17).shuffle(repeats)
             tasks = [(i, n, seed + i, repeats[i]) for i, n in enumerate(sizes)]
+        elif is_transfer and args.gemm_repeats != 1:
+            tasks = [(i, n, seed + i, args.gemm_repeats) for i, n in enumerate(sizes)]
         else:
             tasks = [(i, n, seed + i) for i, n in enumerate(sizes)]
         for repetition in range(args.rep_start, args.rep_start + args.repetitions):
@@ -283,9 +295,10 @@ def main():
             random.Random(seed * 1009 + repetition).shuffle(order)
             for index, policy in enumerate(order):
                 record = run(policy, tasks, resident=args.resident,
-                             transfer=args.workload == "transfer",
+                             transfer=is_transfer,
                              reuse_pinned_inputs=args.reuse_pinned_inputs)
-                record.update(workload=args.workload, task_count=task_count, seed=seed, repetition=repetition,
+                record.update(workload=args.workload, task_count=task_count, gemm_repeats=args.gemm_repeats,
+                              seed=seed, repetition=repetition,
                               order=index, mode=data["mode"])
                 data["runs"].append(record)
                 write_outputs(data, args.out)
