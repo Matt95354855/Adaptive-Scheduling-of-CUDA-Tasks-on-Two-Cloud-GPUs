@@ -1,0 +1,3 @@
+policy,n_runs,makespan_ms,worker_gap_sum_ms,gpu_event_sum_ms,h2d_ms_sum,input_prepare_ms_median,queue_wait_median_ms,reply_delay_median_ms
+round_robin,8,1527.378,1.373,2037.097,125.828,5.362,496.244,0.451
+single,8,2489.599,1.058,2050.718,125.434,4.180,985.107,0.511
