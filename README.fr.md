@@ -2,7 +2,7 @@
 
 **Quand un ordonnanceur « intelligent » bat-il vraiment le round-robin en multi-GPU ?** Banc d'essai contrôlé de six politiques d'affectation sur deux NVIDIA RTX PRO 4000 Blackwell (RunPod), avec exécutions appariées et randomisées, et données brutes publiées.
 
-![Python](https://img.shields.io/badge/Python-3.12-3776AB) ![PyTorch](https://img.shields.io/badge/PyTorch-2.8%20%2B%20CUDA%2012.8-EE4C2C) ![GPU](https://img.shields.io/badge/GPU-2×%20RTX%20PRO%204000%20Blackwell-76B900) ![License](https://img.shields.io/badge/license-MIT-green)
+[![CI](https://github.com/Matt95354855/Adaptive-Scheduling-of-CUDA-Tasks-on-Two-Cloud-GPUs/actions/workflows/ci.yml/badge.svg)](https://github.com/Matt95354855/Adaptive-Scheduling-of-CUDA-Tasks-on-Two-Cloud-GPUs/actions/workflows/ci.yml) ![Python](https://img.shields.io/badge/Python-3.12-3776AB) ![PyTorch](https://img.shields.io/badge/PyTorch-2.8%20%2B%20CUDA%2012.8-EE4C2C) ![GPU](https://img.shields.io/badge/GPU-2×%20RTX%20PRO%204000%20Blackwell-76B900) ![License](https://img.shields.io/badge/license-MIT-green)
 
 [English](README.md) · [Français](README.fr.md)
 

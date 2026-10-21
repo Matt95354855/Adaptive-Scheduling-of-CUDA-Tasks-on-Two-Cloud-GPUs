@@ -1,0 +1,42 @@
+name: CI
+
+# CPU-only checks: the benchmark itself needs two CUDA GPUs, but the analysis
+# of the published data is pure Python and must stay reproducible.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  analysis:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile benchmark and analysis scripts
+        run: python -m py_compile experiments/*.py
+
+      - name: Check shell diagnostic syntax
+        run: bash -n experiments/diagnose.sh
+
+      - name: Re-run the paired analysis on every published dataset
+        run: |
+          for f in results/*-paired-*.csv; do
+            echo "::group::$f"
+            python experiments/analyze.py "$f"
+            echo "::endgroup::"
+          done
+
+      - name: Verify the headline result is reproduced
+        run: |
+          out=$(python experiments/analyze.py results/compute-paired-2026-10-20.csv)
+          echo "$out"
+          echo "$out" | grep -E '^size_lpt,48\.015,-7\.18,12/12,' \
+            || { echo "Headline result (size_lpt -7.18 %, 12/12 vs round-robin) no longer reproduced"; exit 1; }
