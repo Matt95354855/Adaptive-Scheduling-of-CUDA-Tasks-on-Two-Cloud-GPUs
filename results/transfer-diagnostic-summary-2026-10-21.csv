@@ -1,0 +1,8 @@
+experiment,policy,n_runs,makespan_ms,worker_gap_sum_ms,gpu_event_sum_ms,h2d_ms_sum,input_prepare_ms_median,queue_wait_median_ms,reply_delay_median_ms
+allocated_pinned,calibrated,16,109.292,1.596,9.852,27.776,0.505,52.116,0.144
+allocated_pinned,feedback,16,112.581,35.544,10.059,28.258,0.559,0.100,0.123
+allocated_pinned,round_robin,16,103.515,1.594,9.693,27.938,0.428,42.815,0.158
+allocated_pinned,single,16,71.736,0.876,9.550,26.610,0.309,44.601,0.132
+allocated_pinned,size_lpt,16,111.356,1.594,9.958,27.478,0.585,55.436,0.148
+reused_pinned,round_robin,16,40.949,1.174,9.425,23.849,0.000,28.652,0.101
+reused_pinned,single,16,53.962,0.997,9.415,20.916,0.000,36.892,0.103
