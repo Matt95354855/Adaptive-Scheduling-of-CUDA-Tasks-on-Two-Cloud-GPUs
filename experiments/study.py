@@ -13,7 +13,10 @@ from pathlib import Path
 POLICIES = ("single", "round_robin", "size_fifo", "size_lpt", "calibrated", "feedback")
 SIZES = {"micro": [256, 512, 768, 1024] * 8,
          "compute": [1024, 2048, 3072, 4096] * 6,
-         "hidden": [3072] * 24}
+         "hidden": [3072] * 24,
+         # Independent tasks whose operands are created in pinned host memory
+         # and copied to the selected GPU inside the measured window.
+         "transfer": [1024, 1536, 2048] * 8}
 
 
 def plan(policy, tasks, calibration):
@@ -38,22 +41,31 @@ def plan(policy, tasks, calibration):
     return assignment
 
 
-def worker(gpu, requests, replies, sizes, resident):
+def worker(gpu, requests, replies, sizes, resident, transfer):
     import torch
     torch.cuda.set_device(gpu)
     device = f"cuda:{gpu}"
     calibration = {}
-    # Per-size and per-GPU timing, outside the measured batch. The timed task
-    # still includes allocation and validation, so this is only a cost proxy.
+    # Per-size and per-GPU timing, outside the measured batch. For the transfer
+    # workload the proxy includes copies from already allocated pinned memory.
+    # Timed tasks still include host allocation and validation.
     for n in sizes:
         a = torch.ones((n, n), device=device)
         b = torch.ones((n, n), device=device)
         torch.mm(a, b)
+        if transfer:
+            a_host = torch.ones((n, n), pin_memory=True)
+            b_host = torch.ones((n, n), pin_memory=True)
         samples = []
         for _ in range(5):
             begin, end = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
             begin.record()
-            torch.mm(a, b)
+            if transfer:
+                a_device = a_host.to(device, non_blocking=True)
+                b_device = b_host.to(device, non_blocking=True)
+                torch.mm(a_device, b_device)
+            else:
+                torch.mm(a, b)
             end.record()
             end.synchronize()
             samples.append(begin.elapsed_time(end))
@@ -71,11 +83,27 @@ def worker(gpu, requests, replies, sizes, resident):
         repeats = extra[0] if extra else 1
         start_ns = time.monotonic_ns()
         scale = 1.0 if resident else ((seed % 7) + 1) / 8.0
+        h2d_ms = 0.0
+        input_prepare_begin_ns = time.monotonic_ns()
         if resident:
             a, b, c = resident_data[n]
+            input_prepare_ns = time.monotonic_ns() - input_prepare_begin_ns
+        elif transfer:
+            a_host = torch.full((n, n), scale, pin_memory=True)
+            b_host = torch.ones((n, n), pin_memory=True)
+            input_prepare_ns = time.monotonic_ns() - input_prepare_begin_ns
+            torch.cuda.synchronize(gpu)
+            transfer_begin, transfer_end = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
+            transfer_begin.record()
+            a = a_host.to(device, non_blocking=True)
+            b = b_host.to(device, non_blocking=True)
+            transfer_end.record()
+            transfer_end.synchronize()
+            h2d_ms = transfer_begin.elapsed_time(transfer_end)
         else:
             a = torch.full((n, n), scale, device=device)
             b = torch.ones((n, n), device=device)
+            input_prepare_ns = time.monotonic_ns() - input_prepare_begin_ns
         torch.cuda.synchronize(gpu)
         begin, end = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
         torch.cuda.nvtx.range_push(f"task_{task_id}_n{n}_gpu{gpu}")
@@ -93,16 +121,18 @@ def worker(gpu, requests, replies, sizes, resident):
         expected = scale * n ** 3
         replies.put({"kind": "done", "id": task_id, "n": n, "repeats": repeats, "gpu": gpu,
                      "start_ns": start_ns, "finish_ns": finish_ns,
-                     "gpu_ms": begin.elapsed_time(end),
+                     "gpu_ms": begin.elapsed_time(end), "h2d_ms": h2d_ms,
+                     "input_prepare_ms": input_prepare_ns / 1e6,
                      "correct": abs(actual - expected) <= max(1.0, expected * 1e-4)})
 
 
-def run(policy, tasks, resident=False):
+def run(policy, tasks, resident=False, transfer=False):
     ctx = mp.get_context("spawn")
     requests = [ctx.Queue() for _ in range(2)]
     replies = ctx.Queue()
     processes = [ctx.Process(target=worker, args=(g, requests[g], replies,
-                                                sorted({task[1] for task in tasks}), resident)) for g in range(2)]
+                                                sorted({task[1] for task in tasks}), resident, transfer))
+                 for g in range(2)]
     for process in processes:
         process.start()
     try:
@@ -154,6 +184,9 @@ def run(policy, tasks, resident=False):
                   "gpu1_n3": sum(x["n"] ** 3 for x in by_gpu[1]),
                   "gpu0_event_ms": sum(x["gpu_ms"] for x in by_gpu[0]),
                   "gpu1_event_ms": sum(x["gpu_ms"] for x in by_gpu[1]),
+                  "gpu0_h2d_ms": sum(x["h2d_ms"] for x in by_gpu[0]),
+                  "gpu1_h2d_ms": sum(x["h2d_ms"] for x in by_gpu[1]),
+                  "input_prepare_ms_median": statistics.median(x["input_prepare_ms"] for x in completed),
                   "host_task_ms_median": statistics.median((x["finish_ns"] - x["start_ns"]) / 1e6 for x in completed),
                   "calibration": calibration,
                   "tasks": sorted(completed, key=lambda x: x["id"])}
@@ -173,7 +206,7 @@ def write_outputs(data, path):
     path.write_text(json.dumps(data, separators=(",", ":")) + "\n")
     fields = ("workload", "mode", "seed", "repetition", "order", "policy", "makespan_ms", "dispatch_ms",
               "gpu0_tasks", "gpu1_tasks", "gpu0_n3", "gpu1_n3", "gpu0_event_ms", "gpu1_event_ms",
-              "host_task_ms_median")
+              "gpu0_h2d_ms", "gpu1_h2d_ms", "input_prepare_ms_median", "host_task_ms_median")
     with path.with_suffix(".csv").open("w", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=fields)
         writer.writeheader()
@@ -192,11 +225,14 @@ def main():
     parser.add_argument("--policies", nargs="+", choices=POLICIES, default=POLICIES)
     parser.add_argument("--resident", action="store_true", help="Preallocate operands and output per size")
     args = parser.parse_args()
+    if args.resident and args.workload == "transfer":
+        raise ValueError("--resident cannot be combined with the transfer workload")
     import torch
     if torch.cuda.device_count() < 2:
         raise RuntimeError("Two CUDA GPUs required")
-    data = {"schema_version": 2, "workload": args.workload,
-            "mode": "resident" if args.resident else "allocating", "seed_start": args.seed_start,
+    mode = "resident" if args.resident else ("host_to_device" if args.workload == "transfer" else "allocating")
+    data = {"schema_version": 3, "workload": args.workload,
+            "mode": mode, "seed_start": args.seed_start,
             "seed_count": args.seeds, "rep_start": args.rep_start,
             "repetitions": args.repetitions,
             "gpus": [torch.cuda.get_device_name(g) for g in range(2)],
@@ -215,7 +251,8 @@ def main():
             order = list(args.policies)
             random.Random(seed * 1009 + repetition).shuffle(order)
             for index, policy in enumerate(order):
-                record = run(policy, tasks, resident=args.resident)
+                record = run(policy, tasks, resident=args.resident,
+                             transfer=args.workload == "transfer")
                 record.update(workload=args.workload, seed=seed, repetition=repetition,
                               order=index, mode=data["mode"])
                 data["runs"].append(record)
