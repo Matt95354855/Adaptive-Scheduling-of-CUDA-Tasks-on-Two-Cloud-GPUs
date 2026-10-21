@@ -1,54 +1,83 @@
 # Adaptive Scheduling of CUDA Tasks on Two Cloud GPUs
 
-This repository studies how independent CUDA tasks are assigned to two cloud GPUs. The current implementation is a **research pilot**, not a demonstrated general-purpose scheduler. It compares one GPU, fixed round-robin assignment, and a completion-feedback policy that sends the next task to the first available GPU.
+**When does a smarter scheduler actually beat round-robin on multi-GPU?** A controlled benchmark of six task-assignment policies on two NVIDIA RTX PRO 4000 Blackwell GPUs (RunPod), with paired, randomized runs and published raw data.
 
-## Host-to-device transfer study completed on 21 October 2026
+[![CI](https://github.com/Matt95354855/Adaptive-Scheduling-of-CUDA-Tasks-on-Two-Cloud-GPUs/actions/workflows/ci.yml/badge.svg)](https://github.com/Matt95354855/Adaptive-Scheduling-of-CUDA-Tasks-on-Two-Cloud-GPUs/actions/workflows/ci.yml) ![Python](https://img.shields.io/badge/Python-3.12-3776AB) ![PyTorch](https://img.shields.io/badge/PyTorch-2.8%20%2B%20CUDA%2012.8-EE4C2C) ![GPU](https://img.shields.io/badge/GPU-2×%20RTX%20PRO%204000%20Blackwell-76B900) ![License](https://img.shields.io/badge/license-MIT-green)
 
-The transfer study tests 24 independent H2D-plus-GEMM tasks on two RTX PRO 4000 Blackwell GPUs. Its key result is conditional on input lifetime: with fresh pinned-host allocation in every task, `single` was 23.07% faster than round-robin across all eight task orders; retaining the H2D copies but reusing pinned inputs reversed the result, with round-robin 35.86% faster across all eight orders. Nsight Systems confirms that H2D dominates captured GPU memory-operation time, while the control shows that per-task pinned allocation materially determines which policy wins.
+[English](README.md) · [Français](README.fr.md)
 
-- [Transfer results, Nsight analysis, conclusions, and limits](docs/transfer-results-2026-10-21.md)
-- [Allocated-input paired measurements](results/transfer-paired-2026-10-21.csv)
-- [Reused-pinned-input control](results/transfer-reused-pinned-paired-2026-10-21.csv)
-- [Transfer benchmark code](experiments/study.py)
+![Median batch makespan per policy](docs/images/results.png)
 
-The pod uses ephemeral disk by request. The repository therefore retains paired results and trace aggregates, but not raw task JSON or the binary Nsight trace.
+## Key findings
 
-## Follow-up study completed on 20 October 2026
+Paired analysis over 12 independent task orders per workload (8 for transfers) (`experiments/analyze.py`), change vs round-robin with 95 % bootstrap CI:
 
-The follow-up uses twelve independent task orders per workload, randomized policy order, paired seed-level analysis, static size-aware baselines, a resident-input control, a hidden-duration stress test, and a focused Nsight Systems capture. The central result is conditional: static size-aware scheduling wins when cost is visible; completion feedback wins when costs are hidden and round-robin is imbalanced; feedback loses on short tasks and already balanced orders.
+| Workload | Best policy | Speed-up vs 1 GPU | vs round-robin | Orders won |
+|---|---|---:|---:|---:|
+| 24 compute-bound GEMMs, mixed sizes | **Size-aware LPT** (static, knows `n³`) | **1.53×** | **−7.2 %** [−10.0, −4.0] | 12/12 |
+| 32 small GEMMs (≤ 1024) | Round-robin (static) | 1.13× | completion feedback **+12.5 %** slower [+9.6, +15.7] | — |
+| Same-size tasks with hidden cost (12× repeats) | **Completion feedback** | **1.84×** | −10.9 % [−16.1, +2.5] | 8/12 |
+| 24 H2D + GEMM tasks, pinned inputs allocated per task | **1 GPU** | — | −23.1 % [−32.8, −13.9] | 8/8 |
+| Same copies, pinned inputs reused | **Round-robin** | 1.31× | 1 GPU is +35.9 % slower [+28.0, +39.2] | 8/8 |
 
-- [Complete results, post-analysis, Nsight summary, and limits](docs/followup-results-2026-10-20.md)
-- [Predeclared follow-up protocol](docs/followup-protocol-2026-10-20.md)
-- [Paired compute measurements](results/compute-paired-2026-10-20.csv)
-- [Paired hidden-duration measurements](results/hidden-paired-2026-10-20.csv)
-- [Follow-up benchmark and analysis scripts](experiments/study.py)
+- **Task count is a poor balance metric.** Round-robin gave each GPU 12 tasks but a 1.39× imbalance in `n³` work; the calibrated cost-model policy brought it to 1.06×.
+- **Reactive feedback only pays off when durations are unpredictable** — and even then the gain is not yet statistically conclusive (CI crosses zero). When metadata predicts cost, a static size-aware partition wins with zero orchestration overhead.
+- **With host-to-device transfers, input lifetime decides the winner.** Allocating pinned host memory in every task made two GPUs *slower* than one (−23 % for a single GPU); reusing the pinned buffers with the same copies flipped the result (one GPU became 36 % slower than round-robin). GEMM and H2D times were nearly identical across policies: the host allocation path is the bottleneck.
+- **On small tasks the host dominates**: CUDA kernels account for ~3–4 ms of a 25–30 ms batch; allocations and inter-process messaging decide the result.
+- Cloud runs under a hard **$2 spending cap** per session (pilot: $0.25); every output checksum validated; the CI re-runs the paired analysis on all published data.
 
-The RunPod pod used for the 20 October study was stopped after that study. Raw task JSON and the binary Nsight trace were on a container without persistent storage; published paired measurements and the trace summary are retained in this repository.
+## Method
 
-## Initial pilot completed on 20 October 2026
+```mermaid
+flowchart LR
+    A[Task batch<br/>GEMM sizes, seeds] --> P{Policy}
+    P -->|single| G0
+    P -->|round_robin / size_fifo / size_lpt / calibrated| Q[Static queues]
+    P -->|feedback| F[One task in flight<br/>per GPU]
+    Q --> G0[Worker GPU 0]
+    Q --> G1[Worker GPU 1]
+    F --> G0
+    F --> G1
+    G0 & G1 --> M[CUDA events + NVTX<br/>checksum validation]
+    M --> R[Paired CSV results]
+```
 
-Two NVIDIA RTX PRO 4000 Blackwell GPUs were tested on RunPod with a spending cap of $2. The short pilot found that the feedback policy helped on task orders that left round-robin imbalanced, while round-robin was better on a deliberately balanced order and on very small tasks. All checked output sums passed. These results are limited to one instance and three repetitions per cell.
-
-- [Full observations and limitations](docs/observations-2026-10-20.md)
-- [Individual run summary (CSV)](results/pilot-summary-2026-10-20.csv)
-- [Reproduction protocol](docs/protocol.md)
-- [Benchmark code](experiments/pilot.py) and [system diagnostic](experiments/diagnose.sh)
-
-Nsight Systems 2025.1.1 captured CUDA and NVTX activity during the smoke test. The binary trace and per-task JSON files were stored on a pod without persistent storage and are not included here. The CSV preserves the run-level observations. No host-to-device or inter-GPU transfer was tested; transfer-aware scheduling remains future work.
+- Six policies: `single`, `round_robin`, `size_fifo`, `size_lpt`, `calibrated` (per-GPU cost model from CUDA events), `feedback`.
+- Each `(seed, repetition)` block runs all policies in a **randomized order** to cancel drift; 12 seeds × 2–3 repetitions per workload.
+- Fresh `spawn` processes, warm-up and calibration outside the timed window; Nsight Systems trace of the smoke test.
+- Pre-registered protocol: the hidden-cost workload was documented **before** it was measured.
 
 ## Quick start
 
-Requires Python with CUDA-enabled PyTorch and two visible NVIDIA GPUs.
+Requires CUDA-enabled PyTorch and two visible NVIDIA GPUs.
 
 ```bash
-bash experiments/diagnose.sh
+bash experiments/diagnose.sh                       # GPU topology, driver, CUDA check
 python experiments/pilot.py --smoke --out results/smoke.json
-python experiments/pilot.py --repetitions 3 --out results/pilot.json
-python experiments/pilot.py --workload compute --shuffle --seed 43 --repetitions 3 --out results/compute-shuffled.json
+python experiments/study.py --workload compute --out results/compute.json        # paired study, randomized policy order
+python experiments/analyze.py results/compute-paired-2026-10-20.csv              # paired analysis of published data
 ```
 
-See the protocol for the balanced control and Nsight command. This code is designed for short, reproducible pilot runs. It is not yet a transfer-cost model, DAG scheduler, or production runtime.
+## Repository structure
+
+```text
+experiments/   benchmark runner (pilot.py, study.py), metrics and analysis scripts, diagnostics
+results/       paired per-run CSVs and balance / diagnostic summaries (2026-10-20)
+docs/          protocols, observations and limitations, figures
+```
+
+## Limitations
+
+Single instance, identical GPUs over PCIe (no NVLink), independent tasks, 8–12 task orders per workload. Raw per-task JSON and binary Nsight traces were on ephemeral storage; paired results and trace aggregates are retained. These results describe this implementation, not schedulers in general. Next: inter-GPU data locality, DAG workloads, larger samples.
+
+## Documentation
+
+- [Host-to-device transfer results and Nsight analysis](docs/transfer-results-2026-10-21.md) (FR)
+- [Follow-up results, post-analysis and Nsight summary](docs/followup-results-2026-10-20.md) (FR)
+- [Follow-up protocol](docs/followup-protocol-2026-10-20.md) (FR) · [Pilot protocol](docs/protocol.md) (FR)
+- [Pilot observations and limitations](docs/observations-2026-10-20.md) (FR)
+- Raw data: [`results/`](results/)
 
 ## License
 
-MIT; see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).
