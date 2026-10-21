@@ -37,16 +37,30 @@ Nsight Systems 2025.1.1 a profilé une répétition du seed 410 avec `single` et
 
 Cette trace confirme que le transfert est un coût réel. Elle ne prouve ni une saturation PCIe ni une topologie particulière. Le contrôle avec tampons réutilisés apporte la preuve plus utile ici : il isole l'allocation hôte par tâche comme variable qui change le sens de la comparaison.
 
+## Charge GPU soutenue
+
+Pour éviter de conclure à partir de lots trop courts, une deuxième charge transfère 12 paires de matrices de tailles 4096, 5120 et 6144 (quatre de chaque), puis répète chaque GEMM 16 fois. Les entrées épinglées sont allouées dans chaque tâche. Quatre ordres de tâches (seeds 600–603) et deux répétitions par politique ont été exécutés.
+
+| Politique | Médiane par seed (ms) | Écart à round-robin | Victoires par seed | IC bootstrap 95 % |
+| --- | ---: | ---: | ---: | --- |
+| round_robin | 1 528,394 | 0,00 % | — | — |
+| single | 2 489,462 | +64,86 % | 0/4 | [+50,13 ; +88,97] % |
+
+Les sommes d'événements GEMM sont presque identiques entre politiques (2 037,097 ms pour round-robin, 2 050,718 ms pour single), mais la somme des événements n'est pas un temps mural : elle dépasse le makespan lorsqu'ils se chevauchent sur les deux GPU. Les copies H2D cumulées sont aussi proches (125,828 ms et 125,434 ms). Ici, le calcul soutenu amortit l'allocation hôte et le parallélisme de round-robin devient déterminant.
+
+Un échantillonnage `nvidia-smi` à environ une seconde pendant cette série, qui mélange volontairement les deux politiques, a relevé un pic de 100 % sur chacun des GPU. Il contient 25 échantillons à au moins 90 % pour le GPU 0, huit pour le GPU 1 et cinq instants où les deux lignes associées étaient simultanément à au moins 90 %. Il ne mesure pas une moyenne d'occupation par politique, mais confirme que la charge atteint effectivement les deux appareils. Les résultats détaillés sont dans `results/transfer-heavy-paired-2026-10-21.csv`, `results/transfer-heavy-diagnostic-summary-2026-10-21.csv` et `results/transfer-heavy-utilization-summary-2026-10-21.csv`.
+
 ## Conclusion opérationnelle
 
 Pour cette implémentation, la règle n'est pas « deux GPU accélèrent toujours » ni « les copies H2D imposent un seul GPU ». Le choix dépend de l'état des entrées :
 
 - avec allocation épinglée dans chaque tâche, `single` a été le meilleur sur les huit ordres testés ;
 - avec tampons épinglés réutilisés, `round_robin` a été le meilleur sur les huit mêmes ordres ;
+- sous calcul soutenu, `round_robin` a été le meilleur sur les quatre ordres lourds et a réellement chargé les deux GPU ;
 - `feedback` ajoute ici une dépendance de contrôle entre tâches et reste plus lent que round-robin.
 
 Un ordonnanceur qui ignore le cycle de vie des entrées peut sélectionner une mauvaise politique même si ses estimations de GEMM sont exactes. La prochaine expérience utile est de varier séparément la taille des copies et le nombre de tâches, puis de mesurer l'allocation épinglée avec un profileur CPU. Elle devra aussi répéter l'étude sur une seconde instance avant toute généralisation.
 
 ## Limites et conservation
 
-Cette étude porte sur un seul pod et un seul logiciel. Les JSON détaillés et le fichier binaire Nsight étaient sur le disque éphémère du pod, car aucun stockage persistant n'a été demandé ; ils ne seront pas conservés après l'arrêt. Le dépôt conserve le code, les 80 mesures de l'expérience allouée, les 32 mesures du contrôle, les statistiques Nsight agrégées et la méthode d'analyse. Les intervalles internes de worker publiés dans le CSV ne sont pas une mesure directe d'occupation GPU.
+Cette étude porte sur un seul pod et un seul logiciel. Les JSON détaillés et le fichier binaire Nsight étaient sur le disque éphémère du pod, car aucun stockage persistant n'a été demandé ; ils ne seront pas conservés après l'arrêt. Le dépôt conserve le code, les 80 mesures de l'expérience allouée, les 32 mesures du contrôle, les 16 mesures lourdes, les statistiques Nsight agrégées et la méthode d'analyse. Les intervalles internes de worker publiés dans le CSV ne sont pas une mesure directe d'occupation GPU.
