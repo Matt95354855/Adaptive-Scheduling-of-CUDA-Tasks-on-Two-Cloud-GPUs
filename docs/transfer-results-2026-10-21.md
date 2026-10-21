@@ -50,6 +50,28 @@ Les sommes d'événements GEMM sont presque identiques entre politiques (2 037,0
 
 Un échantillonnage `nvidia-smi` à environ une seconde pendant cette série, qui mélange volontairement les deux politiques, a relevé un pic de 100 % sur chacun des GPU. Il contient 25 échantillons à au moins 90 % pour le GPU 0, huit pour le GPU 1 et cinq instants où les deux lignes associées étaient simultanément à au moins 90 %. Il ne mesure pas une moyenne d'occupation par politique, mais confirme que la charge atteint effectivement les deux appareils. Les résultats détaillés sont dans `results/transfer-heavy-paired-2026-10-21.csv`, `results/transfer-heavy-diagnostic-summary-2026-10-21.csv` et `results/transfer-heavy-utilization-summary-2026-10-21.csv`.
 
+## Durées cachées sous charge de transfert
+
+Pour tester l'adaptation en régime calculé, douze tâches de taille visible identique 4096 ont été copiées depuis l'hôte. Quatre exécutent 32 GEMM et huit en exécutent 4 ; cette multiplicité est mélangée par seed et n'est jamais fournie à l'ordonnanceur. Huit ordres indépendants sont exécutés une fois avec `single`, `round_robin` et `feedback`.
+
+| Politique | Médiane par seed (ms) | Écart à round-robin | Victoires par seed | IC bootstrap 95 % |
+| --- | ---: | ---: | ---: | --- |
+| feedback | 550,130 | -8,11 % | 6/8 | [-19,18 ; +4,40] % |
+| round_robin | 604,551 | 0,00 % | — | — |
+| single | 975,915 | +63,05 % | 0/8 | [+43,99 ; +82,02] % |
+
+Les sommes de GEMM et de copies H2D sont pratiquement égales entre `feedback` et round-robin (769,102 contre 773,680 ms de GEMM ; 84,301 contre 84,133 ms H2D). La différence concerne la fin de lot : round-robin attend davantage de tâches déjà affectées à un worker (médiane de file 219,329 ms), tandis que feedback réaffecte une tâche dès une fin observée. Le signe est cohérent avec cette explication, mais l'intervalle inclut zéro : huit ordres et une répétition ne suffisent pas pour affirmer un gain général. Les données sont dans `results/transfer-hidden-paired-2026-10-21.csv` et `results/transfer-hidden-diagnostic-summary-2026-10-21.csv`.
+
+## Sonde finale de saturation hôte et GPU
+
+Cette sonde est séparée de l'évaluation des politiques. Pendant 60 secondes demandées, deux processus ont répété des GEMM 6144×6144, un par GPU, tandis que 40 processus CPU exécutaient une préparation hôte synthétique indépendante. Les deux checksums GPU ont passé ; l'exécution a duré 69,744 s avec 3 910 et 3 915 GEMM complétés.
+
+`nvidia-smi`, échantillonné chaque seconde, mesure 84,5 % et 84,3 % de moyenne sur les GPU 0 et 1, une médiane de 100 % et 59 échantillons sur 70 à au moins 70 % pour chacun. La cible GPU est donc atteinte. `top` rapporte seulement 37,3 % de moyenne CPU sur les 48 processeurs logiques visibles. Le cgroup du pod limite cependant le conteneur à 2 040 000 µs par période de 100 000 µs, soit 20,4 cœurs : ce plafond vaut 42,5 % de ces 48 processeurs. Les 40 producteurs atteignent donc le plafond CPU du pod, même si l'échelle hôte ne peut pas afficher 70 %. La table reproductible est `results/saturation-probe-summary-2026-10-21.csv` et le code est `experiments/saturation_probe.py`.
+
+## Contrôle de longueur de lot
+
+Sur le sous-lot de 12 tâches, l'allocation épinglée par tâche conserve le résultat court : `single` est 23,84 % plus rapide que round-robin (4/4 seeds, IC [-28,29 ; -18,94] %). Avec les mêmes copies mais les entrées hôte réutilisées, round-robin reprend l'avantage : `single` est 22,14 % plus lent (0/4, IC [+10,58 ; +26,48] %). Ces contrôles plus courts, publiés dans `results/transfer-scale-12-fresh-paired-2026-10-21.csv` et `results/transfer-scale-12-reused-pinned-paired-2026-10-21.csv`, confirment que le changement ne dépend pas uniquement du nombre de tâches.
+
 ## Conclusion opérationnelle
 
 Pour cette implémentation, la règle n'est pas « deux GPU accélèrent toujours » ni « les copies H2D imposent un seul GPU ». Le choix dépend de l'état des entrées :
@@ -57,10 +79,11 @@ Pour cette implémentation, la règle n'est pas « deux GPU accélèrent toujour
 - avec allocation épinglée dans chaque tâche, `single` a été le meilleur sur les huit ordres testés ;
 - avec tampons épinglés réutilisés, `round_robin` a été le meilleur sur les huit mêmes ordres ;
 - sous calcul soutenu, `round_robin` a été le meilleur sur les quatre ordres lourds et a réellement chargé les deux GPU ;
-- `feedback` ajoute ici une dépendance de contrôle entre tâches et reste plus lent que round-robin.
+- avec durées cachées sous transfert, feedback a un avantage descriptif de 8,11 %, encore trop incertain pour être généralisé ;
+- le CPU du pod est plafonné à 20,4 cœurs, ce qui doit être pris en compte lors de toute analyse de pression hôte.
 
 Un ordonnanceur qui ignore le cycle de vie des entrées peut sélectionner une mauvaise politique même si ses estimations de GEMM sont exactes. La prochaine expérience utile est de varier séparément la taille des copies et le nombre de tâches, puis de mesurer l'allocation épinglée avec un profileur CPU. Elle devra aussi répéter l'étude sur une seconde instance avant toute généralisation.
 
 ## Limites et conservation
 
-Cette étude porte sur un seul pod et un seul logiciel. Les JSON détaillés et le fichier binaire Nsight étaient sur le disque éphémère du pod, car aucun stockage persistant n'a été demandé ; ils ne seront pas conservés après l'arrêt. Le dépôt conserve le code, les 80 mesures de l'expérience allouée, les 32 mesures du contrôle, les 16 mesures lourdes, les statistiques Nsight agrégées et la méthode d'analyse. Les intervalles internes de worker publiés dans le CSV ne sont pas une mesure directe d'occupation GPU.
+Cette étude porte sur un seul pod et un seul logiciel. Les JSON détaillés et le fichier binaire Nsight étaient sur le disque éphémère du pod, car aucun stockage persistant n'a été demandé ; ils ne seront pas conservés après l'arrêt. Le dépôt conserve le code, les 80 mesures de l'expérience allouée, les 32 mesures du contrôle, les 16 mesures lourdes, les 24 mesures à durée cachée, les contrôles de longueur de lot, la sonde de saturation, les statistiques Nsight agrégées et la méthode d'analyse. Les intervalles internes de worker publiés dans le CSV ne sont pas une mesure directe d'occupation GPU.
