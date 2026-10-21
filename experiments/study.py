@@ -41,7 +41,7 @@ def plan(policy, tasks, calibration):
     return assignment
 
 
-def worker(gpu, requests, replies, sizes, resident, transfer):
+def worker(gpu, requests, replies, sizes, resident, transfer, reuse_pinned_inputs):
     import torch
     torch.cuda.set_device(gpu)
     device = f"cuda:{gpu}"
@@ -73,6 +73,11 @@ def worker(gpu, requests, replies, sizes, resident, transfer):
     resident_data = {n: (torch.ones((n, n), device=device),
                          torch.ones((n, n), device=device),
                          torch.empty((n, n), device=device)) for n in sizes} if resident else {}
+    # This control retains the H2D copy in every task while removing per-task
+    # pinned-host allocation.  Its inputs are constant, so its checksum scale
+    # is deliberately fixed at one.
+    pinned_data = {n: (torch.ones((n, n), pin_memory=True),
+                       torch.ones((n, n), pin_memory=True)) for n in sizes} if reuse_pinned_inputs else {}
     torch.cuda.synchronize(gpu)
     replies.put({"kind": "ready", "gpu": gpu, "calibration": calibration})
     while True:
@@ -82,12 +87,23 @@ def worker(gpu, requests, replies, sizes, resident, transfer):
         task_id, n, seed, *extra = task
         repeats = extra[0] if extra else 1
         start_ns = time.monotonic_ns()
-        scale = 1.0 if resident else ((seed % 7) + 1) / 8.0
+        scale = 1.0 if (resident or reuse_pinned_inputs) else ((seed % 7) + 1) / 8.0
         h2d_ms = 0.0
         input_prepare_begin_ns = time.monotonic_ns()
         if resident:
             a, b, c = resident_data[n]
             input_prepare_ns = time.monotonic_ns() - input_prepare_begin_ns
+        elif transfer and reuse_pinned_inputs:
+            a_host, b_host = pinned_data[n]
+            input_prepare_ns = time.monotonic_ns() - input_prepare_begin_ns
+            torch.cuda.synchronize(gpu)
+            transfer_begin, transfer_end = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
+            transfer_begin.record()
+            a = a_host.to(device, non_blocking=True)
+            b = b_host.to(device, non_blocking=True)
+            transfer_end.record()
+            transfer_end.synchronize()
+            h2d_ms = transfer_begin.elapsed_time(transfer_end)
         elif transfer:
             a_host = torch.full((n, n), scale, pin_memory=True)
             b_host = torch.ones((n, n), pin_memory=True)
@@ -126,12 +142,13 @@ def worker(gpu, requests, replies, sizes, resident, transfer):
                      "correct": abs(actual - expected) <= max(1.0, expected * 1e-4)})
 
 
-def run(policy, tasks, resident=False, transfer=False):
+def run(policy, tasks, resident=False, transfer=False, reuse_pinned_inputs=False):
     ctx = mp.get_context("spawn")
     requests = [ctx.Queue() for _ in range(2)]
     replies = ctx.Queue()
     processes = [ctx.Process(target=worker, args=(g, requests[g], replies,
-                                                sorted({task[1] for task in tasks}), resident, transfer))
+                                                sorted({task[1] for task in tasks}), resident, transfer,
+                                                reuse_pinned_inputs))
                  for g in range(2)]
     for process in processes:
         process.start()
@@ -224,14 +241,20 @@ def main():
     parser.add_argument("--rep-start", type=int, default=0, help="Repetition index offset for follow-up blocks")
     parser.add_argument("--policies", nargs="+", choices=POLICIES, default=POLICIES)
     parser.add_argument("--resident", action="store_true", help="Preallocate operands and output per size")
+    parser.add_argument("--reuse-pinned-inputs", action="store_true",
+                        help="For transfer: reuse pinned host inputs while retaining H2D copies")
     args = parser.parse_args()
     if args.resident and args.workload == "transfer":
         raise ValueError("--resident cannot be combined with the transfer workload")
+    if args.reuse_pinned_inputs and args.workload != "transfer":
+        raise ValueError("--reuse-pinned-inputs requires the transfer workload")
     import torch
     if torch.cuda.device_count() < 2:
         raise RuntimeError("Two CUDA GPUs required")
-    mode = "resident" if args.resident else ("host_to_device" if args.workload == "transfer" else "allocating")
-    data = {"schema_version": 3, "workload": args.workload,
+    mode = ("resident" if args.resident else
+            ("host_to_device_reused_pinned" if args.reuse_pinned_inputs else
+             ("host_to_device" if args.workload == "transfer" else "allocating")))
+    data = {"schema_version": 4, "workload": args.workload,
             "mode": mode, "seed_start": args.seed_start,
             "seed_count": args.seeds, "rep_start": args.rep_start,
             "repetitions": args.repetitions,
@@ -252,7 +275,8 @@ def main():
             random.Random(seed * 1009 + repetition).shuffle(order)
             for index, policy in enumerate(order):
                 record = run(policy, tasks, resident=args.resident,
-                             transfer=args.workload == "transfer")
+                             transfer=args.workload == "transfer",
+                             reuse_pinned_inputs=args.reuse_pinned_inputs)
                 record.update(workload=args.workload, seed=seed, repetition=repetition,
                               order=index, mode=data["mode"])
                 data["runs"].append(record)
