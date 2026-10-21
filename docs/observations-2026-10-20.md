@@ -1,5 +1,7 @@
 # Observations du pilote RunPod — 20 octobre 2026
 
+> Ce document décrit le pilote initial. Les mesures appariées, la post-analyse, le contrôle de durée cachée et la synthèse Nsight de l'étude de suivi sont dans [followup-results-2026-10-20.md](followup-results-2026-10-20.md).
+
 ## Statut
 
 Il s'agit d'un pilote de diagnostic sur une seule instance, avec trois répétitions par cellule. Les chiffres ci-dessous ne démontrent ni supériorité générale d'un ordonnanceur, ni nouveauté scientifique. Le fichier [`results/pilot-summary-2026-10-20.csv`](../results/pilot-summary-2026-10-20.csv) contient les 36 mesures individuelles relevées pendant la session. Les JSON par tâche et la trace binaire Nsight n'ont pas été transférés hors du pod ; ils ne sont donc pas disponibles dans ce dépôt.
