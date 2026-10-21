@@ -221,7 +221,7 @@ def run(policy, tasks, resident=False, transfer=False, reuse_pinned_inputs=False
 def write_outputs(data, path):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, separators=(",", ":")) + "\n")
-    fields = ("workload", "mode", "seed", "repetition", "order", "policy", "makespan_ms", "dispatch_ms",
+    fields = ("workload", "mode", "task_count", "seed", "repetition", "order", "policy", "makespan_ms", "dispatch_ms",
               "gpu0_tasks", "gpu1_tasks", "gpu0_n3", "gpu1_n3", "gpu0_event_ms", "gpu1_event_ms",
               "gpu0_h2d_ms", "gpu1_h2d_ms", "input_prepare_ms_median", "host_task_ms_median")
     with path.with_suffix(".csv").open("w", newline="") as file:
@@ -243,18 +243,24 @@ def main():
     parser.add_argument("--resident", action="store_true", help="Preallocate operands and output per size")
     parser.add_argument("--reuse-pinned-inputs", action="store_true",
                         help="For transfer: reuse pinned host inputs while retaining H2D copies")
+    parser.add_argument("--transfer-tasks", type=int, default=None,
+                        help="For transfer: number of tasks, divisible by three (default: 24)")
     args = parser.parse_args()
     if args.resident and args.workload == "transfer":
         raise ValueError("--resident cannot be combined with the transfer workload")
     if args.reuse_pinned_inputs and args.workload != "transfer":
         raise ValueError("--reuse-pinned-inputs requires the transfer workload")
+    if args.transfer_tasks is not None:
+        if args.workload != "transfer" or args.transfer_tasks < 3 or args.transfer_tasks % 3:
+            raise ValueError("--transfer-tasks requires transfer and a positive multiple of three")
     import torch
     if torch.cuda.device_count() < 2:
         raise RuntimeError("Two CUDA GPUs required")
     mode = ("resident" if args.resident else
             ("host_to_device_reused_pinned" if args.reuse_pinned_inputs else
              ("host_to_device" if args.workload == "transfer" else "allocating")))
-    data = {"schema_version": 4, "workload": args.workload,
+    task_count = args.transfer_tasks or len(SIZES[args.workload])
+    data = {"schema_version": 4, "workload": args.workload, "task_count": task_count,
             "mode": mode, "seed_start": args.seed_start,
             "seed_count": args.seeds, "rep_start": args.rep_start,
             "repetitions": args.repetitions,
@@ -263,6 +269,8 @@ def main():
             "runs": []}
     for seed in range(args.seed_start, args.seed_start + args.seeds):
         sizes = SIZES[args.workload].copy()
+        if args.transfer_tasks is not None:
+            sizes = [1024, 1536, 2048] * (args.transfer_tasks // 3)
         random.Random(seed).shuffle(sizes)
         if args.workload == "hidden":
             repeats = [12] * 8 + [1] * 16
@@ -277,7 +285,7 @@ def main():
                 record = run(policy, tasks, resident=args.resident,
                              transfer=args.workload == "transfer",
                              reuse_pinned_inputs=args.reuse_pinned_inputs)
-                record.update(workload=args.workload, seed=seed, repetition=repetition,
+                record.update(workload=args.workload, task_count=task_count, seed=seed, repetition=repetition,
                               order=index, mode=data["mode"])
                 data["runs"].append(record)
                 write_outputs(data, args.out)
