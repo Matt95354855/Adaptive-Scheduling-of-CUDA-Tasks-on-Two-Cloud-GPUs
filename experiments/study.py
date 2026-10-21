@@ -19,7 +19,10 @@ SIZES = {"micro": [256, 512, 768, 1024] * 8,
          "transfer": [1024, 1536, 2048] * 8,
          # A sustained transfer-plus-compute workload.  Larger matrices and
          # repeated GEMMs make device utilization observable at batch level.
-         "transfer_heavy": [4096, 5120, 6144] * 4}
+         "transfer_heavy": [4096, 5120, 6144] * 4,
+         # Equal visible sizes with a hidden, shuffled compute multiplicity.
+         # This preserves the H2D path while testing online feedback.
+         "transfer_hidden": [4096] * 12}
 
 
 def plan(policy, tasks, calibration):
@@ -284,6 +287,12 @@ def main():
         random.Random(seed).shuffle(sizes)
         if args.workload == "hidden":
             repeats = [12] * 8 + [1] * 16
+            random.Random(seed ^ 0x5A17).shuffle(repeats)
+            tasks = [(i, n, seed + i, repeats[i]) for i, n in enumerate(sizes)]
+        elif args.workload == "transfer_hidden":
+            # Four tasks are eight times longer than the other eight.  The
+            # scheduler receives only equal matrix sizes, never this field.
+            repeats = [32] * 4 + [4] * 8
             random.Random(seed ^ 0x5A17).shuffle(repeats)
             tasks = [(i, n, seed + i, repeats[i]) for i, n in enumerate(sizes)]
         elif is_transfer and args.gemm_repeats != 1:
