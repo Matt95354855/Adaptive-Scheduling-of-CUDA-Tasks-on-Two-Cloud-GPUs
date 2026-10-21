@@ -4,12 +4,14 @@ This repository studies how independent CUDA tasks are assigned to two cloud GPU
 
 ## Host-to-device transfer study completed on 21 October 2026
 
-The transfer study tests H2D-plus-GEMM tasks on two RTX PRO 4000 Blackwell GPUs. Its key result is conditional on input lifetime and task duration: with fresh pinned-host allocation in every short task, `single` was 23.07% faster than round-robin across all eight task orders; retaining the H2D copies but reusing pinned inputs reversed the result, with round-robin 35.86% faster. On a sustained workload of 4096–6144 matrices and 16 GEMMs per task, round-robin was 64.86% faster and monitoring recorded 100% utilization peaks on both GPUs. Nsight Systems confirms that H2D dominates captured GPU memory-operation time, while the controls show that the input lifecycle and compute duration determine which policy wins.
+The transfer study tests H2D-plus-GEMM tasks on two RTX PRO 4000 Blackwell GPUs. Its key result is conditional on input lifetime and task duration: with fresh pinned-host allocation in every short task, `single` was 23.07% faster than round-robin across all eight task orders; retaining the H2D copies but reusing pinned inputs reversed the result, with round-robin 35.86% faster. On a sustained workload of 4096–6144 matrices and 16 GEMMs per task, round-robin was 64.86% faster and monitoring recorded 100% utilization medians on both GPUs. When duration was deliberately hidden from the scheduler, feedback showed a descriptive 8.11% median gain over round-robin, with an interval still consistent with no gain. Nsight Systems confirms that H2D dominates captured GPU memory-operation time, while the controls show that the input lifecycle and compute duration determine which policy wins.
 
 - [Transfer results, Nsight analysis, conclusions, and limits](docs/transfer-results-2026-10-21.md)
 - [Allocated-input paired measurements](results/transfer-paired-2026-10-21.csv)
 - [Reused-pinned-input control](results/transfer-reused-pinned-paired-2026-10-21.csv)
 - [Sustained heavy-load measurements](results/transfer-heavy-paired-2026-10-21.csv)
+- [Hidden-duration adaptive measurements](results/transfer-hidden-paired-2026-10-21.csv)
+- [Host and GPU saturation probe](results/saturation-probe-summary-2026-10-21.csv)
 - [Transfer benchmark code](experiments/study.py)
 
 The pod uses ephemeral disk by request. The repository therefore retains paired results and trace aggregates, but not raw task JSON or the binary Nsight trace.
