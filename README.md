@@ -16,6 +16,12 @@ The transfer study tests H2D-plus-GEMM tasks on two RTX PRO 4000 Blackwell GPUs.
 
 The pod uses ephemeral disk by request. The repository therefore retains paired results and trace aggregates, but not raw task JSON or the binary Nsight trace.
 
+## Next prepared campaign
+
+The next campaign will replicate the hidden-duration result and vary controlled host CPU contention before selecting the condition for an independent replication.
+
+- [Predeclared next-campaign protocol and ready-to-run commands](docs/next-campaign-protocol-2026-10-21.md)
+
 ## Follow-up study completed on 20 October 2026
 
 The follow-up uses twelve independent task orders per workload, randomized policy order, paired seed-level analysis, static size-aware baselines, a resident-input control, a hidden-duration stress test, and a focused Nsight Systems capture. The central result is conditional: static size-aware scheduling wins when cost is visible; completion feedback wins when costs are hidden and round-robin is imbalanced; feedback loses on short tasks and already balanced orders.
