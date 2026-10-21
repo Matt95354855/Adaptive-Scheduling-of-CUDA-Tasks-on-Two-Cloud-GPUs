@@ -20,6 +20,9 @@ def derive(run):
     row["reply_delay_ms_median"] = statistics.median(
         (x["reply_ns"] - x["finish_ns"]) / 1e6 for x in tasks)
     row["gpu_event_ms_sum"] = sum(x["gpu_ms"] for x in tasks)
+    row["h2d_ms_sum"] = sum(x.get("h2d_ms", 0.0) for x in tasks)
+    row["input_prepare_ms_median"] = statistics.median(
+        x.get("input_prepare_ms", 0.0) for x in tasks)
     return row
 
 
