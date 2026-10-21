@@ -2,6 +2,7 @@
 """Paired two-GPU scheduling study; requires CUDA-enabled PyTorch."""
 import argparse
 import csv
+import hashlib
 import json
 import multiprocessing as mp
 import queue
@@ -45,6 +46,16 @@ def plan(policy, tasks, calibration):
             work[gpu] += n ** 3
         assignment[task_id] = gpu
     return assignment
+
+
+def host_load_worker(start, stop, ready, active):
+    """CPU-bound host-work surrogate used only in the contention control."""
+    block = b"cuda-host-contention" * 65536
+    ready.put(True)
+    start.wait()
+    active.put(True)
+    while not stop.is_set():
+        hashlib.sha512(block).digest()
 
 
 def worker(gpu, requests, replies, sizes, resident, transfer, reuse_pinned_inputs):
@@ -148,10 +159,12 @@ def worker(gpu, requests, replies, sizes, resident, transfer, reuse_pinned_input
                      "correct": abs(actual - expected) <= max(1.0, expected * 1e-4)})
 
 
-def run(policy, tasks, resident=False, transfer=False, reuse_pinned_inputs=False):
+def run(policy, tasks, resident=False, transfer=False, reuse_pinned_inputs=False,
+        host_load_workers=0):
     ctx = mp.get_context("spawn")
     requests = [ctx.Queue() for _ in range(2)]
     replies = ctx.Queue()
+    load_stop, load_processes = None, []
     processes = [ctx.Process(target=worker, args=(g, requests[g], replies,
                                                 sorted({task[1] for task in tasks}), resident, transfer,
                                                 reuse_pinned_inputs))
@@ -166,6 +179,21 @@ def run(policy, tasks, resident=False, transfer=False, reuse_pinned_inputs=False
                 raise RuntimeError(msg)
             calibration[msg["gpu"]] = msg["calibration"]
         assignment = plan(policy, [(task[0], task[1]) for task in tasks], calibration)
+        # Start the control after worker calibration and before the timer. This
+        # makes host pressure an experimental factor rather than setup time.
+        if host_load_workers:
+            load_start, load_stop = ctx.Event(), ctx.Event()
+            load_ready, load_active = ctx.Queue(), ctx.Queue()
+            load_processes = [ctx.Process(target=host_load_worker,
+                                          args=(load_start, load_stop, load_ready, load_active))
+                              for _ in range(host_load_workers)]
+            for process in load_processes:
+                process.start()
+            for _ in load_processes:
+                load_ready.get(timeout=30)
+            load_start.set()
+            for _ in load_processes:
+                load_active.get(timeout=30)
         sent, completed, dispatch_ns, dispatch_times = 0, [], 0, {}
         begin_ns = time.monotonic_ns()
 
@@ -201,6 +229,7 @@ def run(policy, tasks, resident=False, transfer=False, reuse_pinned_inputs=False
         by_gpu = [[x for x in completed if x["gpu"] == g] for g in range(2)]
         makespan_ms = (end_ns - begin_ns) / 1e6
         record = {"policy": policy, "makespan_ms": makespan_ms,
+                  "host_load_workers": host_load_workers,
                   "dispatch_ms": dispatch_ns / 1e6,
                   "gpu0_tasks": len(by_gpu[0]), "gpu1_tasks": len(by_gpu[1]),
                   "gpu0_n3": sum(x["n"] ** 3 for x in by_gpu[0]),
@@ -215,6 +244,13 @@ def run(policy, tasks, resident=False, transfer=False, reuse_pinned_inputs=False
                   "tasks": sorted(completed, key=lambda x: x["id"])}
         return record
     finally:
+        if load_stop is not None:
+            load_stop.set()
+        for process in load_processes:
+            process.join(timeout=10)
+            if process.is_alive():
+                process.terminate()
+                process.join(timeout=5)
         for request in requests:
             request.put(None)
         for process in processes:
@@ -227,7 +263,7 @@ def run(policy, tasks, resident=False, transfer=False, reuse_pinned_inputs=False
 def write_outputs(data, path):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, separators=(",", ":")) + "\n")
-    fields = ("workload", "mode", "task_count", "gemm_repeats", "seed", "repetition", "order", "policy", "makespan_ms", "dispatch_ms",
+    fields = ("workload", "mode", "task_count", "gemm_repeats", "host_load_workers", "seed", "repetition", "order", "policy", "makespan_ms", "dispatch_ms",
               "gpu0_tasks", "gpu1_tasks", "gpu0_n3", "gpu1_n3", "gpu0_event_ms", "gpu1_event_ms",
               "gpu0_h2d_ms", "gpu1_h2d_ms", "input_prepare_ms_median", "host_task_ms_median")
     with path.with_suffix(".csv").open("w", newline="") as file:
@@ -253,6 +289,8 @@ def main():
                         help="For transfer: number of tasks, divisible by three (default: 24)")
     parser.add_argument("--gemm-repeats", type=int, default=1,
                         help="Repeat each transfer GEMM this many times after its H2D copy")
+    parser.add_argument("--host-load-workers", type=int, default=0,
+                        help="CPU host-contention processes, started outside each timed batch")
     args = parser.parse_args()
     is_transfer = args.workload.startswith("transfer")
     if args.resident and is_transfer:
@@ -264,6 +302,8 @@ def main():
             raise ValueError("--transfer-tasks requires a transfer workload and a positive multiple of three")
     if args.gemm_repeats < 1:
         raise ValueError("--gemm-repeats must be positive")
+    if args.host_load_workers < 0:
+        raise ValueError("--host-load-workers must be non-negative")
     import torch
     if torch.cuda.device_count() < 2:
         raise RuntimeError("Two CUDA GPUs required")
@@ -271,8 +311,8 @@ def main():
             ("host_to_device_reused_pinned" if args.reuse_pinned_inputs else
              ("host_to_device" if is_transfer else "allocating")))
     task_count = args.transfer_tasks or len(SIZES[args.workload])
-    data = {"schema_version": 4, "workload": args.workload, "task_count": task_count,
-            "gemm_repeats": args.gemm_repeats,
+    data = {"schema_version": 5, "workload": args.workload, "task_count": task_count,
+            "gemm_repeats": args.gemm_repeats, "host_load_workers": args.host_load_workers,
             "mode": mode, "seed_start": args.seed_start,
             "seed_count": args.seeds, "rep_start": args.rep_start,
             "repetitions": args.repetitions,
@@ -305,8 +345,10 @@ def main():
             for index, policy in enumerate(order):
                 record = run(policy, tasks, resident=args.resident,
                              transfer=is_transfer,
-                             reuse_pinned_inputs=args.reuse_pinned_inputs)
+                             reuse_pinned_inputs=args.reuse_pinned_inputs,
+                             host_load_workers=args.host_load_workers)
                 record.update(workload=args.workload, task_count=task_count, gemm_repeats=args.gemm_repeats,
+                              host_load_workers=args.host_load_workers,
                               seed=seed, repetition=repetition,
                               order=index, mode=data["mode"])
                 data["runs"].append(record)
