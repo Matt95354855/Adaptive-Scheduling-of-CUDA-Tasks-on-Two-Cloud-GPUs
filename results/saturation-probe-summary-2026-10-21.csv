@@ -1,0 +1,16 @@
+metric,value,unit
+duration,69.744,s
+matrix_size,6144,dimension
+cpu_preprocessor_processes,40,processes
+cpu_visible_logical_processors,48,processors
+cpu_cgroup_quota,20.4,cores
+cpu_top_mean_utilization,37.3,percent_of_visible_host_processors
+cpu_top_median_utilization,43.7,percent_of_visible_host_processors
+gpu0_mean_utilization,84.5,percent
+gpu0_median_utilization,100,percent
+gpu0_samples_at_least_70pct,59,of_70_samples
+gpu1_mean_utilization,84.3,percent
+gpu1_median_utilization,100,percent
+gpu1_samples_at_least_70pct,59,of_70_samples
+gpu0_gemm_iterations,3910,iterations
+gpu1_gemm_iterations,3915,iterations
