@@ -4,12 +4,16 @@ This repository studies how independent CUDA tasks are assigned to two cloud GPU
 
 ## Host contention and independent replication, 23 October 2026
 
-On a new two-RTX PRO 4000 Blackwell pod, a predeclared paired study tested hidden-duration H2D-plus-GEMM tasks with 0 and 40 competing CPU processes. In the first 12 seeds, `feedback` had a descriptive median 16.18% gain over round-robin without CPU load, but its 95% bootstrap interval included zero. Under CPU contention, its median gain was −0.56%; the paired change in gain was −11.09 percentage points [−16.64, −1.80]. Independent H0 replication on 12 new seeds found no overall gain (−1.16% gain, 4/12 wins). Exploratory task-level analysis explains the reversal: feedback won all 11 task orders where round-robin assigned the four long tasks unevenly, but only 2 of 13 already balanced orders. This conditional split was discovered after measurement and needs prospective validation.
+On a new two-RTX PRO 4000 Blackwell pod, a predeclared paired study tested hidden-duration H2D-plus-GEMM tasks with 0 and 40 competing CPU processes. In the first 12 seeds, `feedback` had a descriptive median 16.18% gain over round-robin without CPU load, but its 95% bootstrap interval included zero. Under CPU contention, its median gain was −0.56%; the paired change in gain was −11.09 percentage points [−16.64, −1.80]. Independent H0 replication on 12 new seeds found no overall gain (−1.16% gain, 4/12 wins). Exploratory task-level analysis explains the reversal: feedback won all 11 task orders where round-robin assigned the four long tasks unevenly, but only 2 of 13 already balanced orders. This conditional split was discovered after measurement and then tested prospectively.
+
+That prospective validation is now complete on 24 further seeds (1000–1023): the gain difference between imbalanced and balanced orders was **20.94 percentage points** [13.02, 27.66], meeting its predeclared criterion. Feedback won 14/14 imbalanced orders, while the balanced group's median gain was −1.60% with an interval crossing zero. This validates a conditional result for this synthetic workload on this instance; the true long-task imbalance is known only after execution and is not yet an online scheduling signal.
 
 - [Protocol and complete analysis](docs/contention-results-2026-10-23.md)
 - [Paired H0 and H40 interaction](results/transfer-hidden-contention-2026-10-23.json)
 - [Independent replication runs](results/transfer-hidden-replication-h0-2026-10-23.csv)
 - [Seed-level balance analysis](results/transfer-hidden-seed-strata-2026-10-23.csv)
+- [Prospective validation protocol](docs/strata-validation-protocol-2026-10-23.md) and [verdict](results/strata-validation-summary-2026-10-23.json)
+- [Research phase checklist and next experiments](docs/research-status-2026-10-23.md)
 - [Analysis code](experiments/contention_analysis.py) and [task export](experiments/task_export.py)
 
 ## Host-to-device transfer study completed on 21 October 2026
