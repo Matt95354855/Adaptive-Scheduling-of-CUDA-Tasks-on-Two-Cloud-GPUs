@@ -9,6 +9,7 @@ On a new two-RTX PRO 4000 Blackwell pod, a predeclared paired study tested hidde
 That prospective validation is now complete on 24 further seeds (1000–1023): the gain difference between imbalanced and balanced orders was **20.94 percentage points** [13.02, 27.66], meeting its predeclared criterion. Feedback won 14/14 imbalanced orders, while the balanced group's median gain was −1.60% with an interval crossing zero. This validates a conditional result for this synthetic workload on this instance; the true long-task imbalance is known only after execution and is not yet an online scheduling signal.
 
 - [Protocol and complete analysis](docs/contention-results-2026-10-23.md)
+- [Illustrated conclusions and three publication-ready charts](docs/visual-analysis-2026-10-23.md) ([plotting code](experiments/plot_research.py))
 - [Paired H0 and H40 interaction](results/transfer-hidden-contention-2026-10-23.json)
 - [Independent replication runs](results/transfer-hidden-replication-h0-2026-10-23.csv)
 - [Seed-level balance analysis](results/transfer-hidden-seed-strata-2026-10-23.csv)
