@@ -2,6 +2,16 @@
 
 This repository studies how independent CUDA tasks are assigned to two cloud GPUs. The current implementation is a **research pilot**, not a demonstrated general-purpose scheduler. It compares one GPU, fixed round-robin assignment, and a completion-feedback policy that sends the next task to the first available GPU.
 
+## Host contention and independent replication, 23 October 2026
+
+On a new two-RTX PRO 4000 Blackwell pod, a predeclared paired study tested hidden-duration H2D-plus-GEMM tasks with 0 and 40 competing CPU processes. In the first 12 seeds, `feedback` had a descriptive median 16.18% gain over round-robin without CPU load, but its 95% bootstrap interval included zero. Under CPU contention, its median gain was −0.56%; the paired change in gain was −11.09 percentage points [−16.64, −1.80]. Independent H0 replication on 12 new seeds found no overall gain (−1.16% gain, 4/12 wins). Exploratory task-level analysis explains the reversal: feedback won all 11 task orders where round-robin assigned the four long tasks unevenly, but only 2 of 13 already balanced orders. This conditional split was discovered after measurement and needs prospective validation.
+
+- [Protocol and complete analysis](docs/contention-results-2026-10-23.md)
+- [Paired H0 and H40 interaction](results/transfer-hidden-contention-2026-10-23.json)
+- [Independent replication runs](results/transfer-hidden-replication-h0-2026-10-23.csv)
+- [Seed-level balance analysis](results/transfer-hidden-seed-strata-2026-10-23.csv)
+- [Analysis code](experiments/contention_analysis.py) and [task export](experiments/task_export.py)
+
 ## Host-to-device transfer study completed on 21 October 2026
 
 The transfer study tests H2D-plus-GEMM tasks on two RTX PRO 4000 Blackwell GPUs. Its key result is conditional on input lifetime and task duration: with fresh pinned-host allocation in every short task, `single` was 23.07% faster than round-robin across all eight task orders; retaining the H2D copies but reusing pinned inputs reversed the result, with round-robin 35.86% faster. On a sustained workload of 4096–6144 matrices and 16 GEMMs per task, round-robin was 64.86% faster and monitoring recorded 100% utilization medians on both GPUs. When duration was deliberately hidden from the scheduler, feedback showed a descriptive 8.11% median gain over round-robin, with an interval still consistent with no gain. Nsight Systems confirms that H2D dominates captured GPU memory-operation time, while the controls show that the input lifecycle and compute duration determine which policy wins.
@@ -16,9 +26,9 @@ The transfer study tests H2D-plus-GEMM tasks on two RTX PRO 4000 Blackwell GPUs.
 
 The pod uses ephemeral disk by request. The repository therefore retains paired results and trace aggregates, but not raw task JSON or the binary Nsight trace.
 
-## Next prepared campaign
+## Predeclared campaign protocol
 
-The next campaign will replicate the hidden-duration result and vary controlled host CPU contention before selecting the condition for an independent replication.
+The host contention and independent replication campaign above followed this protocol.
 
 - [Predeclared next-campaign protocol and ready-to-run commands](docs/next-campaign-protocol-2026-10-21.md)
 
