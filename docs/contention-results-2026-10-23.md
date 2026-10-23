@@ -213,3 +213,15 @@ conditions sur une autre instance est nécessaire pour qualifier la portée du
 résultat H40 et la variabilité cloud. Le critère de groupe actuel utilise les
 durées connues seulement après exécution ; il ne constitue pas lui-même un
 ordonnanceur utilisable en ligne.
+
+## Clôture de l'instance et budget
+
+Après publication des scripts, des CSV par run et par tâche, des agrégats et
+de ce rapport, le pod `twqrwkf0s7u2nu` a été arrêté le 23 octobre 2026.
+RunPod affichait alors **0,00 $/h** pour le pod. À 1,15 $/h pendant environ
+34 minutes, le coût de location est estimé à **0,65 $**, sous le plafond de
+2 $ pour cette session ; ce montant est une estimation, pas une facture.
+Le disque n'avait aucun volume persistant : les JSON bruts et les traces
+binaires Nsight ont été effacés à l'arrêt. Les CSV par tâche gardent les
+chronologies nécessaires aux analyses publiées ; les agrégats Nsight et les
+commandes de reproduction figurent ci-dessus.
