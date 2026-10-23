@@ -1,0 +1,5 @@
+condition,gpu,samples_1s,mean_util_pct,median_util_pct,max_util_pct,samples_nonzero_pct,scope
+H0,0,172,13.0,0,100,27.3,entire_block_including_setup
+H0,1,172,14.9,0,100,26.7,entire_block_including_setup
+H40,0,224,11.0,0,100,31.2,entire_block_including_setup
+H40,1,224,9.8,0,100,29.0,entire_block_including_setup
