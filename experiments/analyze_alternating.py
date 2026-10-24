@@ -45,6 +45,12 @@ def main():
     if result["seed_count"] != args.seeds or result["repetitions_per_cell"] != args.repetitions:
         raise ValueError("Analysis grid differs from protocol")
     result["condition_order_by_seed"] = orders
+    result["interaction_by_order_descriptive"] = {
+        label: {"seeds": len(values), "median_delta_gain_pct_points": statistics.median(values)}
+        for label in ("H0→H40", "H40→H0")
+        for values in [[row["delta_gain_pct"] for row in result["per_seed"]
+                        if orders[row["seed"]] == label]]
+    }
     with Path(f"{args.out_prefix}-summary.json").open("w") as stream:
         json.dump(result, stream, indent=2, sort_keys=True)
         stream.write("\n")
