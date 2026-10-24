@@ -1,0 +1,35 @@
+{
+  "sample_interval_s": 1,
+  "samples": {
+    "0": {
+      "count": 643,
+      "mean_sm_pct": 13.989113530326595,
+      "median_sm_pct": 0,
+      "max_sm_pct": 100,
+      "pct_samples_ge_70": 11.66407465007776,
+      "pct_samples_zero": 69.51788491446345
+    },
+    "1": {
+      "count": 643,
+      "mean_sm_pct": 14.290824261275272,
+      "median_sm_pct": 0,
+      "max_sm_pct": 100,
+      "pct_samples_ge_70": 11.508553654743391,
+      "pct_samples_zero": 68.58475894245723
+    }
+  },
+  "cuda_event_fraction": {
+    "0": {
+      "median_pct": 69.83719453591976,
+      "min_pct": 13.274455659901376,
+      "max_pct": 83.23049760520358
+    },
+    "1": {
+      "median_pct": 70.73807960383587,
+      "min_pct": 13.639285706319685,
+      "max_pct": 83.08509620331712
+    }
+  },
+  "run_count": 240,
+  "task_count": 2880
+}
