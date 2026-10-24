@@ -10,12 +10,12 @@ from pathlib import Path
 from seed_stratification import bootstrap_median, load_block
 
 
-def analyze(rows, draws=10000):
-    if len(rows) != 24 or sorted(r["seed"] for r in rows) != list(range(1000, 1024)):
-        raise ValueError("Expected the complete predeclared seed grid 1000–1023")
+def analyze(rows, draws=10000, seed_start=1000, seed_count=24):
+    if len(rows) != seed_count or sorted(r["seed"] for r in rows) != list(range(seed_start, seed_start + seed_count)):
+        raise ValueError(f"Expected the complete predeclared seed grid {seed_start}–{seed_start + seed_count - 1}")
     balanced = [r["feedback_gain_pct"] for r in rows if r["long_task_imbalance"] == 0]
     imbalanced = [r["feedback_gain_pct"] for r in rows if r["long_task_imbalance"] > 0]
-    if len(balanced) + len(imbalanced) != 24 or not balanced or not imbalanced:
+    if len(balanced) + len(imbalanced) != seed_count or not balanced or not imbalanced:
         raise ValueError("Missing or invalid strata")
     groups = {}
     for name, values in (("balanced", balanced), ("imbalanced", imbalanced)):
@@ -45,9 +45,11 @@ def main():
     parser.add_argument("tasks_csv")
     parser.add_argument("--out-seeds", type=Path, required=True)
     parser.add_argument("--out-summary", type=Path, required=True)
+    parser.add_argument("--seed-start", type=int, default=1000)
+    parser.add_argument("--seed-count", type=int, default=24)
     args = parser.parse_args()
     rows = load_block(args.runs_csv, args.tasks_csv)
-    result = analyze(rows)
+    result = analyze(rows, seed_start=args.seed_start, seed_count=args.seed_count)
     args.out_seeds.parent.mkdir(parents=True, exist_ok=True)
     with args.out_seeds.open("w", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=rows[0].keys())
