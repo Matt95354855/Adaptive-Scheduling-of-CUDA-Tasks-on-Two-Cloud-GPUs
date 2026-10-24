@@ -1,0 +1,17 @@
+transfer_heavy seed=1600 rep=0 round_robin: 4599.220 ms
+transfer_heavy seed=1600 rep=0 feedback: 4621.896 ms
+transfer_heavy seed=1600 rep=1 feedback: 4640.966 ms
+transfer_heavy seed=1600 rep=1 round_robin: 4651.947 ms
+transfer_heavy seed=1601 rep=0 round_robin: 5330.398 ms
+transfer_heavy seed=1601 rep=0 feedback: 4501.835 ms
+transfer_heavy seed=1601 rep=1 round_robin: 5356.819 ms
+transfer_heavy seed=1601 rep=1 feedback: 4520.325 ms
+transfer_heavy seed=1602 rep=0 round_robin: 4791.928 ms
+transfer_heavy seed=1602 rep=0 feedback: 4464.364 ms
+transfer_heavy seed=1602 rep=1 round_robin: 4804.278 ms
+transfer_heavy seed=1602 rep=1 feedback: 4468.334 ms
+transfer_heavy seed=1603 rep=0 feedback: 4880.567 ms
+transfer_heavy seed=1603 rep=0 round_robin: 5022.364 ms
+transfer_heavy seed=1603 rep=1 round_robin: 5029.748 ms
+transfer_heavy seed=1603 rep=1 feedback: 4889.705 ms
+saved results/sustained-2026-10-24.json and results/sustained-2026-10-24.csv
