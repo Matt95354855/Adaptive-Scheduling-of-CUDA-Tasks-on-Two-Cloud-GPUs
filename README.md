@@ -2,6 +2,20 @@
 
 This repository studies how independent CUDA tasks are assigned to two cloud GPUs. The current implementation is a **research pilot**, not a demonstrated general-purpose scheduler. It compares one GPU, fixed round-robin assignment, and a completion-feedback policy that sends the next task to the first available GPU.
 
+## Independent replication and online decision, 24 October 2026
+
+On another two-RTX PRO 4000 Blackwell pod, a prospective 24-seed replication confirmed that feedback's gain depends strongly on the final long-task allocation: median **+18.18%** on 17 imbalanced orders and **−7.88%** on seven balanced orders; the predeclared gap was **+26.05 percentage points** [17.24, 30.11]. An alternating H0/H40 experiment found a median change of **−13.08 points**, but its confidence interval [−21.81, +5.19] does not establish the sign of the CPU-contention effect.
+
+A predeclared four-task online probe then tested whether that retrospective imbalance could guide a real decision. Across **240 runs and 2,880 tasks**, `probe_switch` did **not** beat the same-prefix `probe_feedback` control: median **−0.12%**, 95% bootstrap interval [−0.59, +0.23]. It was **14.62% slower** than feedback without the probe. Post-hoc diagnostics show that `probe_feedback` was faster than `probe_rr` on every seed, so none of the six choices of round-robin helped. These results narrow the scheduling claim: the conditional retrospective effect is reproducible, while this online rule fails its prospective test.
+
+Continuous GPU sampling also explains why an active pod can show 0% between runs. The short online-probe campaign averaged **13.99% / 14.29% SM occupancy** across GPU 0 / GPU 1 despite bursts to 100%. A separate dense control reached **96.27% / 97.41% median CUDA-event time within each measured batch**, but only **48.37% / 49.47% mean SM occupancy across the whole campaign** because workers and calibration restart between batches. The 70% whole-campaign target was not met. Full raw JSON, task CSVs, telemetry, scripts, figures, and conclusions are published for this pod; a new Nsight trace and the predeclared H0/H40 × input-lifetime factorial remain pending.
+
+- [Replication protocol](docs/replication-protocol-2026-10-24.md) and [results](docs/replication-results-2026-10-24.md)
+- [Alternating contention results and paired chart](docs/alternating-contention-results-2026-10-24.md)
+- [Online probe protocol](docs/online-probe-protocol-2026-10-24.md), [results and chart](docs/online-probe-results-2026-10-24.md)
+- [Sustained-utilization protocol](docs/sustained-utilization-protocol-2026-10-24.md) and [results](docs/sustained-utilization-results-2026-10-24.md)
+- [Next factorial protocol](docs/factorial-input-protocol-2026-10-24.md) and [current research checklist](docs/research-status-2026-10-24.md)
+
 ## Host contention and independent replication, 23 October 2026
 
 On a new two-RTX PRO 4000 Blackwell pod, a predeclared paired study tested hidden-duration H2D-plus-GEMM tasks with 0 and 40 competing CPU processes. In the first 12 seeds, `feedback` had a descriptive median 16.18% gain over round-robin without CPU load, but its 95% bootstrap interval included zero. Under CPU contention, its median gain was −0.56%; the paired change in gain was −11.09 percentage points [−16.64, −1.80]. Independent H0 replication on 12 new seeds found no overall gain (−1.16% gain, 4/12 wins). Exploratory task-level analysis explains the reversal: feedback won all 11 task orders where round-robin assigned the four long tasks unevenly, but only 2 of 13 already balanced orders. This conditional split was discovered after measurement and then tested prospectively.
