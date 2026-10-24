@@ -211,9 +211,64 @@ def host_gpu_mechanism() -> None:
     save(fig, "03_diagnostic_hote_gpu")
 
 
+def independent_replication() -> None:
+    datasets = [
+        ("23 oct. · pod initial", rows("strata-validation-seeds-2026-10-23.csv"),
+         summary("strata-validation-summary-2026-10-23.json")),
+        ("24 oct. · nouveau pod", rows("replication-seeds-2026-10-24.csv"),
+         summary("replication-summary-2026-10-24.json")),
+    ]
+    fig, axes = plt.subplots(1, 2, figsize=(12.2, 6.7), sharex=True, sharey=True)
+    fig.subplots_adjust(left=0.17, right=0.96, top=0.73, bottom=0.22, wspace=0.18)
+    for ax, key, color, title in zip(axes,
+                                      ("balanced", "imbalanced"),
+                                      (TEAL, CORAL),
+                                      ("Équilibré 2–2", "Déséquilibré 3–1 / 4–0")):
+        for index, (label, data, stats) in enumerate(datasets):
+            y = 1 - index
+            values = sorted(float(row["feedback_gain_pct"]) for row in data
+                            if (int(row["long_task_imbalance"]) == 0) == (key == "balanced"))
+            jitter = [((i * 7) % 9 - 4) * 0.028 for i in range(len(values))]
+            ax.scatter(values, [y + offset + 0.08 for offset in jitter], s=45,
+                       color=color, edgecolor=PAPER, linewidth=0.9, alpha=0.72, zorder=3)
+            group = stats["groups"][key]
+            low, high = group["bootstrap_95pct_ci"]
+            middle = group["median_gain_pct"]
+            ax.plot([low, high], [y - 0.22, y - 0.22], color=INK,
+                    linewidth=2.8, solid_capstyle="round", zorder=4)
+            ax.plot([low, low], [y - 0.27, y - 0.17], color=INK, linewidth=1.8)
+            ax.plot([high, high], [y - 0.27, y - 0.17], color=INK, linewidth=1.8)
+            ax.scatter([middle], [y - 0.22], marker="D", s=75, color=INK,
+                       edgecolor=PAPER, linewidth=0.8, zorder=5)
+            ax.text(middle, y - 0.37, f"{fmt(middle)} % · {group['wins']}/{group['seeds']}",
+                    color=INK, fontsize=9.3, ha="center", va="top")
+        ax.axvline(0, color=MUTED, linewidth=1.2, linestyle=(0, (4, 4)))
+        ax.grid(axis="x", color=GRID, linewidth=0.8)
+        ax.set_xlim(-18, 35)
+        ax.set_ylim(-0.57, 1.48)
+        ax.set_title(title, loc="left", color=color, fontsize=13.5, fontweight="bold", pad=16)
+        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{x:.0f} %"))
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+    axes[0].set_yticks([1, 0], [datasets[0][0], datasets[1][0]], fontweight="bold")
+    axes[0].tick_params(axis="y", length=0, pad=12)
+    axes[1].tick_params(axis="y", length=0)
+    fig.supxlabel("Gain du feedback sur le temps total (positif = plus rapide)", y=0.13, fontsize=11)
+    fig.text(0.055, 0.93, "04  /  RÉPLICATION INDÉPENDANTE", color=TEAL, fontsize=11, fontweight="bold")
+    fig.text(0.055, 0.865, "La séparation se retrouve sur une nouvelle instance", fontsize=19, fontweight="bold")
+    fig.text(0.055, 0.797, "Différence des médianes : +20,9 points le 23 oct. ; +26,1 points le 24 oct.",
+             fontsize=11, color=MUTED)
+    fig.text(0.055, 0.055,
+             "Chaque point = une seed ; losange = médiane ; trait = IC bootstrap 95 %. 24 seeds distinctes par instance, 2 répétitions.\n"
+             "Le classement repose toujours sur les durées observées après exécution et ne peut pas être appliqué tel quel en ligne.",
+             fontsize=9, color=MUTED, linespacing=1.6)
+    save(fig, "04_replication_independante")
+
+
 if __name__ == "__main__":
     setup()
     prospective()
     contention()
     host_gpu_mechanism()
+    independent_replication()
     print(f"Figures SVG et PNG créées dans {FIGURES}")
