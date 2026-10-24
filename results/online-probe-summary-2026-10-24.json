@@ -1,0 +1,45 @@
+{
+  "comparisons": {
+    "feedback": {
+      "bootstrap_95pct_ci": [
+        -17.097725164207223,
+        -11.514185637589524
+      ],
+      "median_gain_pct": -14.624642054621674,
+      "wins": 0
+    },
+    "probe_feedback": {
+      "bootstrap_95pct_ci": [
+        -0.5883162803718589,
+        0.22531155894788268
+      ],
+      "median_gain_pct": -0.12482813809796545,
+      "wins": 12
+    },
+    "probe_rr": {
+      "bootstrap_95pct_ci": [
+        2.438546951945264,
+        15.010856146005791
+      ],
+      "median_gain_pct": 8.699958051609268,
+      "wins": 21
+    },
+    "round_robin": {
+      "bootstrap_95pct_ci": [
+        -2.8620722411257127,
+        8.608786480146202
+      ],
+      "median_gain_pct": -1.0088203243912242,
+      "wins": 10
+    }
+  },
+  "primary_control": "probe_feedback",
+  "primary_improvement_supported": false,
+  "repetitions": 2,
+  "route_instability_seeds": 0,
+  "seed_count": 24,
+  "switch_routes": {
+    "feedback": 18,
+    "round_robin": 6
+  }
+}
