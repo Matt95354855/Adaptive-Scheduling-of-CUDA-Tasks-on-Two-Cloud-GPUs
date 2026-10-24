@@ -1,0 +1,62 @@
+Sat Oct 24 14:24:01 UTC 2026
+Linux 8307e8a2b102 6.8.0-147-generic #147-Ubuntu SMP PREEMPT_DYNAMIC Thu Sep 24 11:33:16 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+NAME="Ubuntu"
+VERSION_ID="24.04"
+VERSION="24.04.5 LTS (Noble Numbat)"
+VERSION_CODENAME=noble
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=noble
+LOGO=ubuntu-logo
+Sat Oct 24 14:24:01 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.91.07              Driver Version: 595.91.07      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA RTX PRO 4000 Blac...    On  |   00000000:01:00.0 Off |                  Off |
+| 38%   35C    P0             37W /  145W |       4MiB /  24467MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA RTX PRO 4000 Blac...    On  |   00000000:81:00.0 Off |                  Off |
+| 39%   36C    P0             39W /  145W |       4MiB /  24467MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+	[4mGPU0	GPU1	CPU Affinity	NUMA Affinity	GPU NUMA ID[0m
+GPU0	 X 	NODE	0-47	0		N/A
+GPU1	NODE	 X 	0-47	0		N/A
+
+Legend:
+
+  X    = Self
+  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)
+  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node
+  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
+  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)
+  PIX  = Connection traversing at most a single PCIe bridge
+  NV#  = Connection traversing a bonded set of # NVLinks
+Python: 3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]
+PyTorch: 2.8.0+cu128 CUDA: 12.8
+Visible GPUs: 2
+0 NVIDIA RTX PRO 4000 Blackwell _CudaDeviceProperties(name='NVIDIA RTX PRO 4000 Blackwell', major=12, minor=0, total_memory=23987MB, multi_processor_count=70, uuid=78975d79-cc7d-6916-1a7c-338bf5a6167c, pci_bus_id=1, pci_device_id=0, pci_domain_id=0, L2_cache_size=48MB)
+1 NVIDIA RTX PRO 4000 Blackwell _CudaDeviceProperties(name='NVIDIA RTX PRO 4000 Blackwell', major=12, minor=0, total_memory=23987MB, multi_processor_count=70, uuid=d9072712-481b-0e3d-1e79-c443365c6275, pci_bus_id=129, pci_device_id=0, pci_domain_id=0, L2_cache_size=48MB)
+
+Git commit: cf96cce5397d536bc37aae4e9e2bebddb24433ff
+cpu.max: 2040000 100000
+Pod ID: zgi4mo43z7dkw9
+Pod rate USD per hour: 1.15
