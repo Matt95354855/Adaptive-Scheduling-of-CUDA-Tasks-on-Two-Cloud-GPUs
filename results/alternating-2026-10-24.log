@@ -1,0 +1,145 @@
+transfer_hidden seed=1200 rep=0 round_robin: 687.764 ms
+transfer_hidden seed=1200 rep=0 feedback: 556.527 ms
+transfer_hidden seed=1200 rep=1 round_robin: 688.872 ms
+transfer_hidden seed=1200 rep=1 feedback: 563.464 ms
+saved /tmp/tmp7shq6t5i/seed1200-h0.json and /tmp/tmp7shq6t5i/seed1200-h0.csv
+checkpoint 1200 H0: 4 runs
+transfer_hidden seed=1200 rep=0 round_robin: 1424.496 ms
+transfer_hidden seed=1200 rep=0 feedback: 1446.478 ms
+transfer_hidden seed=1200 rep=1 round_robin: 1319.499 ms
+transfer_hidden seed=1200 rep=1 feedback: 1515.513 ms
+saved /tmp/tmp7shq6t5i/seed1200-h40.json and /tmp/tmp7shq6t5i/seed1200-h40.csv
+checkpoint 1200 H40: 8 runs
+transfer_hidden seed=1201 rep=0 feedback: 1529.535 ms
+transfer_hidden seed=1201 rep=0 round_robin: 1621.458 ms
+transfer_hidden seed=1201 rep=1 feedback: 1434.614 ms
+transfer_hidden seed=1201 rep=1 round_robin: 1553.053 ms
+saved /tmp/tmp7shq6t5i/seed1201-h40.json and /tmp/tmp7shq6t5i/seed1201-h40.csv
+checkpoint 1201 H40: 12 runs
+transfer_hidden seed=1201 rep=0 feedback: 610.414 ms
+transfer_hidden seed=1201 rep=0 round_robin: 673.163 ms
+transfer_hidden seed=1201 rep=1 feedback: 600.668 ms
+transfer_hidden seed=1201 rep=1 round_robin: 672.070 ms
+saved /tmp/tmp7shq6t5i/seed1201-h0.json and /tmp/tmp7shq6t5i/seed1201-h0.csv
+checkpoint 1201 H0: 16 runs
+transfer_hidden seed=1202 rep=0 feedback: 563.960 ms
+transfer_hidden seed=1202 rep=0 round_robin: 701.579 ms
+transfer_hidden seed=1202 rep=1 round_robin: 714.109 ms
+transfer_hidden seed=1202 rep=1 feedback: 580.010 ms
+saved /tmp/tmp7shq6t5i/seed1202-h0.json and /tmp/tmp7shq6t5i/seed1202-h0.csv
+checkpoint 1202 H0: 20 runs
+transfer_hidden seed=1202 rep=0 feedback: 1331.520 ms
+transfer_hidden seed=1202 rep=0 round_robin: 1318.471 ms
+transfer_hidden seed=1202 rep=1 round_robin: 1395.019 ms
+transfer_hidden seed=1202 rep=1 feedback: 1443.468 ms
+saved /tmp/tmp7shq6t5i/seed1202-h40.json and /tmp/tmp7shq6t5i/seed1202-h40.csv
+checkpoint 1202 H40: 24 runs
+transfer_hidden seed=1203 rep=0 round_robin: 1326.267 ms
+transfer_hidden seed=1203 rep=0 feedback: 1338.925 ms
+transfer_hidden seed=1203 rep=1 round_robin: 1220.177 ms
+transfer_hidden seed=1203 rep=1 feedback: 1325.544 ms
+saved /tmp/tmp7shq6t5i/seed1203-h40.json and /tmp/tmp7shq6t5i/seed1203-h40.csv
+checkpoint 1203 H40: 28 runs
+transfer_hidden seed=1203 rep=0 round_robin: 691.329 ms
+transfer_hidden seed=1203 rep=0 feedback: 554.992 ms
+transfer_hidden seed=1203 rep=1 round_robin: 690.439 ms
+transfer_hidden seed=1203 rep=1 feedback: 555.077 ms
+saved /tmp/tmp7shq6t5i/seed1203-h0.json and /tmp/tmp7shq6t5i/seed1203-h0.csv
+checkpoint 1203 H0: 32 runs
+transfer_hidden seed=1204 rep=0 feedback: 592.039 ms
+transfer_hidden seed=1204 rep=0 round_robin: 542.670 ms
+transfer_hidden seed=1204 rep=1 round_robin: 545.436 ms
+transfer_hidden seed=1204 rep=1 feedback: 596.965 ms
+saved /tmp/tmp7shq6t5i/seed1204-h0.json and /tmp/tmp7shq6t5i/seed1204-h0.csv
+checkpoint 1204 H0: 36 runs
+transfer_hidden seed=1204 rep=0 feedback: 1261.006 ms
+transfer_hidden seed=1204 rep=0 round_robin: 1515.508 ms
+transfer_hidden seed=1204 rep=1 round_robin: 1313.976 ms
+transfer_hidden seed=1204 rep=1 feedback: 1398.559 ms
+saved /tmp/tmp7shq6t5i/seed1204-h40.json and /tmp/tmp7shq6t5i/seed1204-h40.csv
+checkpoint 1204 H40: 40 runs
+transfer_hidden seed=1205 rep=0 feedback: 1346.639 ms
+transfer_hidden seed=1205 rep=0 round_robin: 1528.581 ms
+transfer_hidden seed=1205 rep=1 feedback: 1321.734 ms
+transfer_hidden seed=1205 rep=1 round_robin: 1398.068 ms
+saved /tmp/tmp7shq6t5i/seed1205-h40.json and /tmp/tmp7shq6t5i/seed1205-h40.csv
+checkpoint 1205 H40: 44 runs
+transfer_hidden seed=1205 rep=0 feedback: 583.796 ms
+transfer_hidden seed=1205 rep=0 round_robin: 562.268 ms
+transfer_hidden seed=1205 rep=1 feedback: 584.052 ms
+transfer_hidden seed=1205 rep=1 round_robin: 551.074 ms
+saved /tmp/tmp7shq6t5i/seed1205-h0.json and /tmp/tmp7shq6t5i/seed1205-h0.csv
+checkpoint 1205 H0: 48 runs
+transfer_hidden seed=1206 rep=0 feedback: 550.290 ms
+transfer_hidden seed=1206 rep=0 round_robin: 552.153 ms
+transfer_hidden seed=1206 rep=1 feedback: 551.837 ms
+transfer_hidden seed=1206 rep=1 round_robin: 553.419 ms
+saved /tmp/tmp7shq6t5i/seed1206-h0.json and /tmp/tmp7shq6t5i/seed1206-h0.csv
+checkpoint 1206 H0: 52 runs
+transfer_hidden seed=1206 rep=0 feedback: 1496.842 ms
+transfer_hidden seed=1206 rep=0 round_robin: 1429.181 ms
+transfer_hidden seed=1206 rep=1 feedback: 1623.369 ms
+transfer_hidden seed=1206 rep=1 round_robin: 1318.642 ms
+saved /tmp/tmp7shq6t5i/seed1206-h40.json and /tmp/tmp7shq6t5i/seed1206-h40.csv
+checkpoint 1206 H40: 56 runs
+transfer_hidden seed=1207 rep=0 feedback: 1421.474 ms
+transfer_hidden seed=1207 rep=0 round_robin: 1218.496 ms
+transfer_hidden seed=1207 rep=1 feedback: 1524.772 ms
+transfer_hidden seed=1207 rep=1 round_robin: 1216.577 ms
+saved /tmp/tmp7shq6t5i/seed1207-h40.json and /tmp/tmp7shq6t5i/seed1207-h40.csv
+checkpoint 1207 H40: 60 runs
+transfer_hidden seed=1207 rep=0 feedback: 616.332 ms
+transfer_hidden seed=1207 rep=0 round_robin: 545.719 ms
+transfer_hidden seed=1207 rep=1 feedback: 620.026 ms
+transfer_hidden seed=1207 rep=1 round_robin: 544.925 ms
+saved /tmp/tmp7shq6t5i/seed1207-h0.json and /tmp/tmp7shq6t5i/seed1207-h0.csv
+checkpoint 1207 H0: 64 runs
+transfer_hidden seed=1208 rep=0 feedback: 542.623 ms
+transfer_hidden seed=1208 rep=0 round_robin: 557.091 ms
+transfer_hidden seed=1208 rep=1 feedback: 548.849 ms
+transfer_hidden seed=1208 rep=1 round_robin: 547.270 ms
+saved /tmp/tmp7shq6t5i/seed1208-h0.json and /tmp/tmp7shq6t5i/seed1208-h0.csv
+checkpoint 1208 H0: 68 runs
+transfer_hidden seed=1208 rep=0 feedback: 1259.107 ms
+transfer_hidden seed=1208 rep=0 round_robin: 1200.395 ms
+transfer_hidden seed=1208 rep=1 feedback: 1431.050 ms
+transfer_hidden seed=1208 rep=1 round_robin: 1220.479 ms
+saved /tmp/tmp7shq6t5i/seed1208-h40.json and /tmp/tmp7shq6t5i/seed1208-h40.csv
+checkpoint 1208 H40: 72 runs
+transfer_hidden seed=1209 rep=0 feedback: 1428.588 ms
+transfer_hidden seed=1209 rep=0 round_robin: 1223.540 ms
+transfer_hidden seed=1209 rep=1 round_robin: 1324.432 ms
+transfer_hidden seed=1209 rep=1 feedback: 1237.328 ms
+saved /tmp/tmp7shq6t5i/seed1209-h40.json and /tmp/tmp7shq6t5i/seed1209-h40.csv
+checkpoint 1209 H40: 76 runs
+transfer_hidden seed=1209 rep=0 feedback: 552.174 ms
+transfer_hidden seed=1209 rep=0 round_robin: 671.043 ms
+transfer_hidden seed=1209 rep=1 round_robin: 674.836 ms
+transfer_hidden seed=1209 rep=1 feedback: 557.639 ms
+saved /tmp/tmp7shq6t5i/seed1209-h0.json and /tmp/tmp7shq6t5i/seed1209-h0.csv
+checkpoint 1209 H0: 80 runs
+transfer_hidden seed=1210 rep=0 feedback: 585.737 ms
+transfer_hidden seed=1210 rep=0 round_robin: 696.361 ms
+transfer_hidden seed=1210 rep=1 feedback: 586.728 ms
+transfer_hidden seed=1210 rep=1 round_robin: 702.318 ms
+saved /tmp/tmp7shq6t5i/seed1210-h0.json and /tmp/tmp7shq6t5i/seed1210-h0.csv
+checkpoint 1210 H0: 84 runs
+transfer_hidden seed=1210 rep=0 feedback: 1335.350 ms
+transfer_hidden seed=1210 rep=0 round_robin: 1223.455 ms
+transfer_hidden seed=1210 rep=1 feedback: 1225.501 ms
+transfer_hidden seed=1210 rep=1 round_robin: 1221.544 ms
+saved /tmp/tmp7shq6t5i/seed1210-h40.json and /tmp/tmp7shq6t5i/seed1210-h40.csv
+checkpoint 1210 H40: 88 runs
+transfer_hidden seed=1211 rep=0 round_robin: 1231.519 ms
+transfer_hidden seed=1211 rep=0 feedback: 1399.670 ms
+transfer_hidden seed=1211 rep=1 round_robin: 1529.404 ms
+transfer_hidden seed=1211 rep=1 feedback: 1227.532 ms
+saved /tmp/tmp7shq6t5i/seed1211-h40.json and /tmp/tmp7shq6t5i/seed1211-h40.csv
+checkpoint 1211 H40: 92 runs
+transfer_hidden seed=1211 rep=0 round_robin: 557.038 ms
+transfer_hidden seed=1211 rep=0 feedback: 617.004 ms
+transfer_hidden seed=1211 rep=1 round_robin: 547.183 ms
+transfer_hidden seed=1211 rep=1 feedback: 626.346 ms
+saved /tmp/tmp7shq6t5i/seed1211-h0.json and /tmp/tmp7shq6t5i/seed1211-h0.csv
+checkpoint 1211 H0: 96 runs
+saved results/alternating-2026-10-24.json and results/alternating-2026-10-24.csv
