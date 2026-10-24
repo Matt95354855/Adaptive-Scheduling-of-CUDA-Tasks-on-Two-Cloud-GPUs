@@ -15,6 +15,8 @@ Le gain positif signifie que `feedback` réduit le makespan par rapport à `roun
 
 Le contraste préenregistré, `gain_H40 − gain_H0`, vaut **−13,08 points de pourcentage**, IC bootstrap 95 % **[−21,81 ; +5,19]**. La direction est compatible avec une dégradation du feedback sous forte contention CPU, mais l'intervalle inclut zéro : cette expérience ne démontre pas le signe de l'interaction. Par ordre d'exécution, le contraste médian descriptif est −17,39 points pour les six seeds H0→H40 et −5,49 points pour les six seeds H40→H0. L'écart appelle un contrôle plus fin ; les sous-groupes sont trop petits pour un verdict.
 
+La [figure appariée](../figures/05_contention_interaction.svg) montre le changement de gain pour chacune des 12 seeds.
+
 ## Diagnostic des tâches et limites causales
 
 Les médianes descriptives de préparation d'une entrée passent d'environ **2,7–2,8 ms** sous H0 à **95,5–98,1 ms** sous H40. La somme des durées d'événements GPU par run reste proche : **786–789 ms** sous H0 et **776–777 ms** sous H40. Le makespan médian passe de **616,7 à 1 319,1 ms** pour `round_robin` et de **581,9 à 1 399,1 ms** pour `feedback`. Les intervalles entre tâches sur les deux workers sont autour de **0,8–0,9 ms** pour `round_robin` ; sous H40 ils atteignent **11,0 et 7,9 ms** pour `feedback`.
