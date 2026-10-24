@@ -36,6 +36,23 @@ en ligne. L'avantage des ordres déséquilibrés est robuste dans ces deux blocs
 de la même charge synthétique, mais sa généralisation à d'autres charges ou
 topologies reste ouverte.
 
+## Lecture des chronologies, exploratoire
+
+Dans les 34 runs dont round-robin déséquilibre les tâches longues, le feedback
+aboutit à une répartition 2–2 dans **28 runs**. Dans les 14 runs où
+round-robin est déjà équilibré, le feedback conserve 2–2 dans **10 runs** et
+crée 3–1 dans **4 runs**. Cela fournit un mécanisme plausible pour le gain
+conditionnel : la politique réactive corrige souvent une mauvaise affectation
+statique, mais peut aussi perturber une affectation déjà bonne.
+
+Les médianes descriptives des runs montrent des sommes d'événements GPU
+quasi identiques, autour de **786–787 ms**, et une préparation des entrées
+autour de **2,7–2,9 ms** par tâche dans les deux politiques et groupes.
+La somme médiane des intervalles entre tâches sur les deux workers est
+environ **1,5 ms** pour round-robin et **4,6–4,8 ms** pour feedback. Ces
+indicateurs sont compatibles avec un coût de coordination et des effets de
+réaffectation ; ils ne décomposent pas causalement la différence de makespan.
+
 ## Données intégrales publiées
 
 - [JSON brut de tous les runs et de toutes les tâches](../results/replication-2026-10-24.json)
