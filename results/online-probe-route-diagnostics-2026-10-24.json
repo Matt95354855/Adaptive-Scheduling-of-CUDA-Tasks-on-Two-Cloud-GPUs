@@ -1,0 +1,14 @@
+{
+  "analysis": "post_hoc_descriptive",
+  "seed_count": 24,
+  "route_vs_full_rr_imbalance": {
+    "imbalance_0_round_robin": 4,
+    "imbalance_0_feedback": 6,
+    "imbalance_1_round_robin": 2,
+    "imbalance_1_feedback": 12
+  },
+  "choice_matches_faster_probe_control": 18,
+  "faster_probe_control_counts": {
+    "feedback": 24
+  }
+}
