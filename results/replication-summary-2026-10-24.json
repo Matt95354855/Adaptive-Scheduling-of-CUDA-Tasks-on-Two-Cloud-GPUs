@@ -1,0 +1,31 @@
+{
+  "analysis_status": "complete",
+  "groups": {
+    "balanced": {
+      "bootstrap_95pct_ci": [
+        -11.408364334725096,
+        -4.069908639012687
+      ],
+      "median_gain_pct": -7.87580186324357,
+      "seeds": 7,
+      "wins": 0
+    },
+    "imbalanced": {
+      "bootstrap_95pct_ci": [
+        9.363195434270343,
+        19.157626444296096
+      ],
+      "median_gain_pct": 18.17541244834382,
+      "seeds": 17,
+      "wins": 17
+    }
+  },
+  "primary": {
+    "bootstrap_95pct_ci": [
+      17.23899729751391,
+      30.108869799938866
+    ],
+    "median_difference_pct_points": 26.05121431158739,
+    "validated_by_protocol": true
+  }
+}
