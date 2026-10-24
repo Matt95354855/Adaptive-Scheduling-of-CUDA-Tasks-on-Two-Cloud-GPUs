@@ -11,7 +11,9 @@ import statistics
 import time
 from pathlib import Path
 
-POLICIES = ("single", "round_robin", "size_fifo", "size_lpt", "calibrated", "feedback")
+POLICIES = ("single", "round_robin", "size_fifo", "size_lpt", "calibrated", "feedback",
+            "probe_rr", "probe_feedback", "probe_switch")
+PROBE_LONG_GPU_MS = 60.0
 SIZES = {"micro": [256, 512, 768, 1024] * 8,
          "compute": [1024, 2048, 3072, 4096] * 6,
          "hidden": [3072] * 24,
@@ -28,7 +30,7 @@ SIZES = {"micro": [256, 512, 768, 1024] * 8,
 
 def plan(policy, tasks, calibration):
     """Return GPU assignment, or None for online completion feedback."""
-    if policy == "feedback":
+    if policy in ("feedback", "probe_rr", "probe_feedback", "probe_switch"):
         return None
     if policy == "single":
         return {i: 0 for i, _ in tasks}
@@ -46,6 +48,22 @@ def plan(policy, tasks, calibration):
             work[gpu] += n ** 3
         assignment[task_id] = gpu
     return assignment
+
+
+def choose_probe_route(completions, policy, threshold_ms=PROBE_LONG_GPU_MS):
+    """Choose from completed GPU events only; never inspect hidden repeats."""
+    counts = [0, 0]
+    for task in completions:
+        counts[task["gpu"]] += task["gpu_ms"] >= threshold_ms
+    if policy == "probe_rr":
+        route = "round_robin"
+    elif policy == "probe_feedback":
+        route = "feedback"
+    elif policy == "probe_switch":
+        route = "feedback" if counts[0] != counts[1] else "round_robin"
+    else:
+        raise ValueError(f"Unknown probe policy: {policy}")
+    return route, counts
 
 
 def host_load_worker(start, stop, ready, active):
@@ -195,6 +213,8 @@ def run(policy, tasks, resident=False, transfer=False, reuse_pinned_inputs=False
             for _ in load_processes:
                 load_active.get(timeout=30)
         sent, completed, dispatch_ns, dispatch_times = 0, [], 0, {}
+        is_probe = policy.startswith("probe_")
+        probe_route, probe_counts, probe_decision_ms = None, None, None
         begin_ns = time.monotonic_ns()
 
         def dispatch(gpu, task):
@@ -205,7 +225,10 @@ def run(policy, tasks, resident=False, transfer=False, reuse_pinned_inputs=False
             dispatch_times[task[0]] = now
             sent += 1
 
-        if assignment is None:
+        if is_probe:
+            for task in tasks[:4]:
+                dispatch(task[0] % 2, task)
+        elif assignment is None:
             for gpu, task in enumerate(tasks[:2]):
                 dispatch(gpu, task)
         else:
@@ -221,7 +244,20 @@ def run(policy, tasks, resident=False, transfer=False, reuse_pinned_inputs=False
             msg["dispatch_ns"] = dispatch_times[msg["id"]]
             msg["reply_ns"] = time.monotonic_ns()
             completed.append(msg)
-            if assignment is None and sent < len(tasks):
+            if is_probe and len(completed) == 4:
+                decision_begin = time.monotonic_ns()
+                probe_route, probe_counts = choose_probe_route(completed, policy)
+                probe_decision_ms = (time.monotonic_ns() - decision_begin) / 1e6
+                if probe_route == "round_robin":
+                    for task in tasks[sent:]:
+                        dispatch(task[0] % 2, task)
+                else:
+                    for gpu in range(2):
+                        if sent < len(tasks):
+                            dispatch(gpu, tasks[sent])
+            elif is_probe and probe_route == "feedback" and sent < len(tasks):
+                dispatch(msg["gpu"], tasks[sent])
+            elif not is_probe and assignment is None and sent < len(tasks):
                 dispatch(msg["gpu"], tasks[sent])
         end_ns = time.monotonic_ns()
         if not all(item["correct"] for item in completed):
@@ -230,6 +266,10 @@ def run(policy, tasks, resident=False, transfer=False, reuse_pinned_inputs=False
         makespan_ms = (end_ns - begin_ns) / 1e6
         record = {"policy": policy, "makespan_ms": makespan_ms,
                   "host_load_workers": host_load_workers,
+                  "probe_route": probe_route,
+                  "probe_long_gpu0": probe_counts[0] if probe_counts is not None else None,
+                  "probe_long_gpu1": probe_counts[1] if probe_counts is not None else None,
+                  "probe_decision_ms": probe_decision_ms,
                   "dispatch_ms": dispatch_ns / 1e6,
                   "gpu0_tasks": len(by_gpu[0]), "gpu1_tasks": len(by_gpu[1]),
                   "gpu0_n3": sum(x["n"] ** 3 for x in by_gpu[0]),
@@ -265,7 +305,8 @@ def write_outputs(data, path):
     path.write_text(json.dumps(data, separators=(",", ":")) + "\n")
     fields = ("workload", "mode", "task_count", "gemm_repeats", "host_load_workers", "seed", "repetition", "order", "policy", "makespan_ms", "dispatch_ms",
               "gpu0_tasks", "gpu1_tasks", "gpu0_n3", "gpu1_n3", "gpu0_event_ms", "gpu1_event_ms",
-              "gpu0_h2d_ms", "gpu1_h2d_ms", "input_prepare_ms_median", "host_task_ms_median")
+              "gpu0_h2d_ms", "gpu1_h2d_ms", "input_prepare_ms_median", "host_task_ms_median",
+              "probe_route", "probe_long_gpu0", "probe_long_gpu1", "probe_decision_ms")
     with path.with_suffix(".csv").open("w", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=fields)
         writer.writeheader()
@@ -304,6 +345,8 @@ def main():
         raise ValueError("--gemm-repeats must be positive")
     if args.host_load_workers < 0:
         raise ValueError("--host-load-workers must be non-negative")
+    if any(policy.startswith("probe_") for policy in args.policies) and args.workload != "transfer_hidden":
+        raise ValueError("Probe policies require transfer_hidden")
     import torch
     if torch.cuda.device_count() < 2:
         raise RuntimeError("Two CUDA GPUs required")
