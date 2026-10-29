@@ -8,7 +8,7 @@ import statistics
 from pathlib import Path
 
 from contention_analysis import analyze, interval
-from factorial_host_input import BASE
+from factorial_host_input import BASE, FIXED_INPUT_SCALE, planned_cells, validate_checkpoint
 from task_metrics import derive
 
 
@@ -24,6 +24,12 @@ def main():
     runs = data["runs"]
     if len(runs) != args.seeds * args.repetitions * 2 * 2 * 2:
         raise ValueError("Incomplete factorial grid")
+    if (data.get("seed_start") != args.seed_start or
+            data.get("seed_count") != args.seeds or
+            data.get("repetitions") != args.repetitions or
+            data.get("fixed_input_scale") != FIXED_INPUT_SCALE):
+        raise ValueError("Factorial metadata does not match the fixed-input protocol")
+    validate_checkpoint(data, planned_cells(args.seed_start, args.seeds), args.repetitions)
     for seed in range(args.seed_start, args.seed_start + args.seeds):
         shift = (seed - args.seed_start) % len(BASE)
         sequence = BASE[shift:] + BASE[:shift]
