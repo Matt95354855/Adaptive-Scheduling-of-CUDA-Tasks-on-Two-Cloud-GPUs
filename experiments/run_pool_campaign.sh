@@ -34,5 +34,4 @@ python experiments/persistent_pool_control.py --out results/pool-v1.json \
 date -u '+%Y-%m-%dT%H:%M:%SZ' > results/pool-v1-end.txt
 python experiments/analyze_pool_control.py results/pool-v1.json \
   --out-prefix results/pool-v1
-python experiments/plot_pool_control.py --prefix results/pool-v1
 echo "Worker-pool control complete: 16 blocks, 64 runs, 768 tasks. Export all files."
