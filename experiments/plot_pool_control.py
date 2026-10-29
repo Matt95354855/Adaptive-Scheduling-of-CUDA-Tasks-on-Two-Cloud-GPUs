@@ -59,8 +59,6 @@ def main():
 
     fig.suptitle("Workers conservés entre quatre lots : coût complet et utilisation",
                  x=.03, ha="left", fontsize=14, fontweight="bold", color="#172c47")
-    fig.text(.03, .01, "Contrôle secondaire descriptif · 8 seeds appariées · deux RTX PRO 4000 Blackwell",
-             color="#556b82", fontsize=8)
     for suffix in ("png", "svg"):
         fig.savefig(f"{args.prefix}-figure.{suffix}", dpi=220, facecolor=fig.get_facecolor())
     plt.close(fig)
