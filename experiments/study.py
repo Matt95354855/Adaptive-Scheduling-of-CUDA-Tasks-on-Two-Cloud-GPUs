@@ -4,6 +4,7 @@ import argparse
 import csv
 import hashlib
 import json
+import math
 import multiprocessing as mp
 import queue
 import random
@@ -76,7 +77,15 @@ def host_load_worker(start, stop, ready, active):
         hashlib.sha512(block).digest()
 
 
-def worker(gpu, requests, replies, sizes, resident, transfer, reuse_pinned_inputs):
+def operand_scale(seed, resident, reuse_pinned_inputs, fixed_input_scale=None):
+    """Keep the old seed-dependent input unless a control fixes both modes."""
+    if fixed_input_scale is not None:
+        return fixed_input_scale
+    return 1.0 if (resident or reuse_pinned_inputs) else ((seed % 7) + 1) / 8.0
+
+
+def worker(gpu, requests, replies, sizes, resident, transfer, reuse_pinned_inputs,
+           fixed_input_scale):
     import torch
     torch.cuda.set_device(gpu)
     device = f"cuda:{gpu}"
@@ -122,7 +131,7 @@ def worker(gpu, requests, replies, sizes, resident, transfer, reuse_pinned_input
         task_id, n, seed, *extra = task
         repeats = extra[0] if extra else 1
         start_ns = time.monotonic_ns()
-        scale = 1.0 if (resident or reuse_pinned_inputs) else ((seed % 7) + 1) / 8.0
+        scale = operand_scale(seed, resident, reuse_pinned_inputs, fixed_input_scale)
         h2d_ms = 0.0
         input_prepare_begin_ns = time.monotonic_ns()
         if resident:
@@ -178,14 +187,14 @@ def worker(gpu, requests, replies, sizes, resident, transfer, reuse_pinned_input
 
 
 def run(policy, tasks, resident=False, transfer=False, reuse_pinned_inputs=False,
-        host_load_workers=0):
+        host_load_workers=0, fixed_input_scale=None):
     ctx = mp.get_context("spawn")
     requests = [ctx.Queue() for _ in range(2)]
     replies = ctx.Queue()
     load_stop, load_processes = None, []
     processes = [ctx.Process(target=worker, args=(g, requests[g], replies,
                                                 sorted({task[1] for task in tasks}), resident, transfer,
-                                                reuse_pinned_inputs))
+                                                reuse_pinned_inputs, fixed_input_scale))
                  for g in range(2)]
     for process in processes:
         process.start()
@@ -303,7 +312,7 @@ def run(policy, tasks, resident=False, transfer=False, reuse_pinned_inputs=False
 def write_outputs(data, path):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, separators=(",", ":")) + "\n")
-    fields = ("workload", "mode", "task_count", "gemm_repeats", "host_load_workers", "seed", "repetition", "order", "policy", "makespan_ms", "dispatch_ms",
+    fields = ("workload", "mode", "task_count", "gemm_repeats", "host_load_workers", "fixed_input_scale", "seed", "repetition", "order", "policy", "makespan_ms", "dispatch_ms",
               "gpu0_tasks", "gpu1_tasks", "gpu0_n3", "gpu1_n3", "gpu0_event_ms", "gpu1_event_ms",
               "gpu0_h2d_ms", "gpu1_h2d_ms", "input_prepare_ms_median", "host_task_ms_median",
               "probe_route", "probe_long_gpu0", "probe_long_gpu1", "probe_decision_ms")
@@ -332,6 +341,8 @@ def main():
                         help="Repeat each transfer GEMM this many times after its H2D copy")
     parser.add_argument("--host-load-workers", type=int, default=0,
                         help="CPU host-contention processes, started outside each timed batch")
+    parser.add_argument("--fixed-input-scale", type=float, default=None,
+                        help="Use the same constant operand scale in fresh and reused modes")
     args = parser.parse_args()
     is_transfer = args.workload.startswith("transfer")
     if args.resident and is_transfer:
@@ -345,6 +356,9 @@ def main():
         raise ValueError("--gemm-repeats must be positive")
     if args.host_load_workers < 0:
         raise ValueError("--host-load-workers must be non-negative")
+    if args.fixed_input_scale is not None and (not math.isfinite(args.fixed_input_scale)
+                                                or args.fixed_input_scale <= 0):
+        raise ValueError("--fixed-input-scale must be finite and positive")
     if any(policy.startswith("probe_") for policy in args.policies) and args.workload != "transfer_hidden":
         raise ValueError("Probe policies require transfer_hidden")
     import torch
@@ -356,6 +370,7 @@ def main():
     task_count = args.transfer_tasks or len(SIZES[args.workload])
     data = {"schema_version": 5, "workload": args.workload, "task_count": task_count,
             "gemm_repeats": args.gemm_repeats, "host_load_workers": args.host_load_workers,
+            "fixed_input_scale": args.fixed_input_scale,
             "mode": mode, "seed_start": args.seed_start,
             "seed_count": args.seeds, "rep_start": args.rep_start,
             "repetitions": args.repetitions,
@@ -389,9 +404,11 @@ def main():
                 record = run(policy, tasks, resident=args.resident,
                              transfer=is_transfer,
                              reuse_pinned_inputs=args.reuse_pinned_inputs,
-                             host_load_workers=args.host_load_workers)
+                             host_load_workers=args.host_load_workers,
+                             fixed_input_scale=args.fixed_input_scale)
                 record.update(workload=args.workload, task_count=task_count, gemm_repeats=args.gemm_repeats,
                               host_load_workers=args.host_load_workers,
+                              fixed_input_scale=args.fixed_input_scale,
                               seed=seed, repetition=repetition,
                               order=index, mode=data["mode"])
                 data["runs"].append(record)
