@@ -1,0 +1,21 @@
+{
+  "checked_at_utc": "2026-10-29T11:28:52.783719+00:00",
+  "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "torch": "2.8.0+cu128",
+  "cuda_runtime": "12.8",
+  "gpu_names": [
+    "NVIDIA RTX PRO 4000 Blackwell",
+    "NVIDIA RTX PRO 4000 Blackwell"
+  ],
+  "gpu_memory_bytes": [
+    25153044480,
+    25153044480
+  ],
+  "nvidia_smi_query": "0, NVIDIA RTX PRO 4000 Blackwell, 24467 MiB, 595.91.07, 00000000:82:00.0\n1, NVIDIA RTX PRO 4000 Blackwell, 24467 MiB, 595.91.07, 00000000:C1:00.0",
+  "nvidia_smi_topology": "\u001b[4mGPU0\tGPU1\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\u001b[0m\nGPU0\t X \tNODE\t0-47\t0\t\tN/A\nGPU1\tNODE\t X \t0-47\t0\t\tN/A\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks",
+  "nsight_version": "NVIDIA Nsight Systems version 2025.1.1.0",
+  "cpu_max": "2040000 100000",
+  "cpu_stat_before": "usage_usec 18536838\nuser_usec 14798727\nsystem_usec 3738111\ncore_sched.force_idle_usec 0\nnr_periods 224\nnr_throttled 3\nthrottled_usec 4869713\nnr_bursts 0\nburst_usec 0\n",
+  "free_disk_bytes": 53664399360
+}
