@@ -79,7 +79,9 @@ aucune seed ne sera retirée après mesure.
    avec `bash experiments/run_pool_campaign.sh`. Il prévoit 16 blocs appariés,
    64 runs et 768 tâches, plus quatre runs de vérification. Exporter les
    journaux GPU de chaque bloc, le JSON brut, les CSV et le résumé ; publier
-   les figures PNG/SVG et chaque fichier sur GitHub avant d'arrêter le pod. Ne pas lancer ce contrôle
+   chaque fichier sur GitHub avant d'arrêter le pod. Générer les figures
+   PNG/SVG après récupération des mesures, sur un environnement Matplotlib.
+   Ne pas lancer ce contrôle
    si son coût estimé compromet la marge d'arrêt.
 
 L'analyse est séquentielle : aucun autre calcul GPU ne tourne pendant la
