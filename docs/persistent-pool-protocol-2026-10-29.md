@@ -52,4 +52,7 @@ Le code, les 64 runs, 768 tâches, 16 journaux GPU, analyses, figures et logs
 seront copiés et publiés sur GitHub avant arrêt du pod. Les scripts peuvent
 reprendre un checkpoint entier uniquement sur le même pod et le même commit.
 Le [générateur de figures](../experiments/plot_pool_control.py) est préparé avant
-location ; aucune figure de résultat n'est créée avant les mesures réelles.
+location. Il s'exécute après récupération des données, dans un environnement
+Matplotlib ; l'absence de cette bibliothèque sur le pod ne doit pas faire
+échouer ni prolonger le calcul GPU. Aucune figure de résultat n'est créée
+avant les mesures réelles.
