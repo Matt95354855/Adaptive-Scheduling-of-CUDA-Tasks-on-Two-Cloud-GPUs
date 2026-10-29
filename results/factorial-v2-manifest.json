@@ -1,0 +1,129 @@
+{
+  "protocol": "factorial_host_input_v2",
+  "complete_runs": 192,
+  "complete_tasks": 2304,
+  "nsight_traces": 0,
+  "total_bytes": 1341300,
+  "files": [
+    {
+      "name": "factorial-v2-code-revision.txt",
+      "bytes": 41,
+      "sha256": "012ec7106d8c74dbf42ee87ef78c466956cab970a49be991a4c8f4cdddc1681f"
+    },
+    {
+      "name": "factorial-v2-console.log",
+      "bytes": 18415,
+      "sha256": "d68528a6efcf8f2e0567206428da041e9be2dd4ae2c1bedea1414b1f57a42b28"
+    },
+    {
+      "name": "factorial-v2-cpu-stat-after.txt",
+      "bytes": 179,
+      "sha256": "b9742287c804b03b5e3226280a3204a1bf79eb95b9462ee78435f54d93452f0d"
+    },
+    {
+      "name": "factorial-v2-cpu-stat-before.txt",
+      "bytes": 169,
+      "sha256": "8ea642bb2c609afd01530189c3a4a653940ce7b23bebc01f0825c54f577d18a5"
+    },
+    {
+      "name": "factorial-v2-end.txt",
+      "bytes": 21,
+      "sha256": "a6b1847f7131cd7bb8e53df2d929c131975886fe44616a40b6f5a3b72c539a43"
+    },
+    {
+      "name": "factorial-v2-fresh-h0.csv",
+      "bytes": 2336,
+      "sha256": "a281e3dcb9756e784e005611d4646f59aaea83ba21f67e267a0243f1aa551808"
+    },
+    {
+      "name": "factorial-v2-fresh-h40.csv",
+      "bytes": 2435,
+      "sha256": "a7804797e64292c6073fe8d3f194fca54d61049816fc790b6bd8f9c5b948ee52"
+    },
+    {
+      "name": "factorial-v2-gpu-util.log",
+      "bytes": 84280,
+      "sha256": "48ba52d4c65ac4316fd3e9bb04884fea86f6a76add00891f0a5438d670b1bc06"
+    },
+    {
+      "name": "factorial-v2-preflight.json",
+      "bytes": 1606,
+      "sha256": "1bf301d1a34e2ccbe8f6bf1e606f6dc86a3c105ca348a7d7bddb5be1eda8515e"
+    },
+    {
+      "name": "factorial-v2-reused-h0.csv",
+      "bytes": 2335,
+      "sha256": "5cb632a53bd46c42a4d625c4c36ee409579979c609b85406f02206ac9e8740b8"
+    },
+    {
+      "name": "factorial-v2-reused-h40.csv",
+      "bytes": 2386,
+      "sha256": "dc9f3679bc2ce7c2765b01b11b5c7151cf61f513deab1c47c88f7ef6eb13ba56"
+    },
+    {
+      "name": "factorial-v2-sessions.log",
+      "bytes": 30,
+      "sha256": "8582072ed416002d8726511cddeef6082a7210b09dd49672905d642987f20d1f"
+    },
+    {
+      "name": "factorial-v2-smoke-fresh.csv",
+      "bytes": 753,
+      "sha256": "afe6c4df76d06e9f14524122f7bbf6e191dc638aef3b9bb0101e6e3928073ee7"
+    },
+    {
+      "name": "factorial-v2-smoke-fresh.json",
+      "bytes": 8041,
+      "sha256": "5adf57a6c67775d519f6c4583110c04a9975caecfaeb18627a6e4fc1b446ae8a"
+    },
+    {
+      "name": "factorial-v2-smoke-reused.csv",
+      "bytes": 779,
+      "sha256": "b25d2c411bd4a77360aca3eacbda8ce31c3d49248142a1927fb5421cfe0dafa9"
+    },
+    {
+      "name": "factorial-v2-smoke-reused.json",
+      "bytes": 8057,
+      "sha256": "73e2d68fb5ebc8fec022f813084e0e1b5878e850b67df45d4241b29c38473af4"
+    },
+    {
+      "name": "factorial-v2-start.txt",
+      "bytes": 21,
+      "sha256": "d8975cc417e5caf5a73e88cf6aed240e47fe335896ec54e4d893f12a80c2dde5"
+    },
+    {
+      "name": "factorial-v2-summary.json",
+      "bytes": 4542,
+      "sha256": "26bacf49d7caee726a7fe98a831d0ee185851c94e971aefc2c791bd6834b7a6d"
+    },
+    {
+      "name": "factorial-v2-task-metrics.csv",
+      "bytes": 36324,
+      "sha256": "845c09b7808b20257ed64104296c5ecf3a7e0a6d78e5f71b91aa48d76e7e91f2"
+    },
+    {
+      "name": "factorial-v2-tasks.csv",
+      "bytes": 366321,
+      "sha256": "5dc0c6c2bfccdbbadbcf612b7ced15998062dcda7401a509c18d66f7b165d140"
+    },
+    {
+      "name": "factorial-v2-utilization.csv",
+      "bytes": 18422,
+      "sha256": "cc48525b8beb4dce79a5734e30dec76d0449e40a9e249f6423a8dcdce87f1da4"
+    },
+    {
+      "name": "factorial-v2-utilization.json",
+      "bytes": 822,
+      "sha256": "ddbd33d17fe55168be3a4e0e481ad2864618a52b4f61e29d1b441c975a3b1b22"
+    },
+    {
+      "name": "factorial-v2.csv",
+      "bytes": 43037,
+      "sha256": "3bccd264c60890a4c2387c7f5c5de9d876bd7e4146721c820d00f2c2f0d2d4cb"
+    },
+    {
+      "name": "factorial-v2.json",
+      "bytes": 739948,
+      "sha256": "06d63bc08346803165bd8b5075471fe4917e1b2377de6c8ee134e7cc9b97336a"
+    }
+  ]
+}

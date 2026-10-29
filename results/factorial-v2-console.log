@@ -1,0 +1,354 @@
+{
+  "status": "ready",
+  "gpu_names": [
+    "NVIDIA RTX PRO 4000 Blackwell",
+    "NVIDIA RTX PRO 4000 Blackwell"
+  ],
+  "free_disk_bytes": 53664399360,
+  "nsight_version": "NVIDIA Nsight Systems version 2025.1.1.0"
+}
+transfer_hidden seed=1499 rep=0 feedback: 552.213 ms
+transfer_hidden seed=1499 rep=0 round_robin: 675.466 ms
+saved results/factorial-v2-smoke-fresh.json and results/factorial-v2-smoke-fresh.csv
+transfer_hidden seed=1499 rep=0 feedback: 473.288 ms
+transfer_hidden seed=1499 rep=0 round_robin: 589.927 ms
+saved results/factorial-v2-smoke-reused.json and results/factorial-v2-smoke-reused.csv
+transfer_hidden seed=1500 rep=0 feedback: 555.861 ms
+transfer_hidden seed=1500 rep=0 round_robin: 533.948 ms
+transfer_hidden seed=1500 rep=1 round_robin: 537.318 ms
+transfer_hidden seed=1500 rep=1 feedback: 557.538 ms
+saved /tmp/tmppsyyu_yh/seed1500-fresh-h0.json and /tmp/tmppsyyu_yh/seed1500-fresh-h0.csv
+checkpoint 1500 fresh H0: 4 runs
+transfer_hidden seed=1500 rep=0 feedback: 633.772 ms
+transfer_hidden seed=1500 rep=0 round_robin: 622.451 ms
+transfer_hidden seed=1500 rep=1 round_robin: 545.064 ms
+transfer_hidden seed=1500 rep=1 feedback: 645.867 ms
+saved /tmp/tmppsyyu_yh/seed1500-reused-h40.json and /tmp/tmppsyyu_yh/seed1500-reused-h40.csv
+checkpoint 1500 reused H40: 8 runs
+transfer_hidden seed=1500 rep=0 feedback: 1090.054 ms
+transfer_hidden seed=1500 rep=0 round_robin: 1226.847 ms
+transfer_hidden seed=1500 rep=1 round_robin: 1463.995 ms
+transfer_hidden seed=1500 rep=1 feedback: 1496.926 ms
+saved /tmp/tmppsyyu_yh/seed1500-fresh-h40.json and /tmp/tmppsyyu_yh/seed1500-fresh-h40.csv
+checkpoint 1500 fresh H40: 12 runs
+transfer_hidden seed=1500 rep=0 feedback: 474.984 ms
+transfer_hidden seed=1500 rep=0 round_robin: 453.051 ms
+transfer_hidden seed=1500 rep=1 round_robin: 452.776 ms
+transfer_hidden seed=1500 rep=1 feedback: 476.919 ms
+saved /tmp/tmppsyyu_yh/seed1500-reused-h0.json and /tmp/tmppsyyu_yh/seed1500-reused-h0.csv
+checkpoint 1500 reused H0: 16 runs
+transfer_hidden seed=1501 rep=0 round_robin: 586.637 ms
+transfer_hidden seed=1501 rep=0 feedback: 547.855 ms
+transfer_hidden seed=1501 rep=1 feedback: 553.486 ms
+transfer_hidden seed=1501 rep=1 round_robin: 571.100 ms
+saved /tmp/tmppsyyu_yh/seed1501-reused-h40.json and /tmp/tmppsyyu_yh/seed1501-reused-h40.csv
+checkpoint 1501 reused H40: 20 runs
+transfer_hidden seed=1501 rep=0 round_robin: 1371.303 ms
+transfer_hidden seed=1501 rep=0 feedback: 1369.404 ms
+transfer_hidden seed=1501 rep=1 feedback: 1378.135 ms
+transfer_hidden seed=1501 rep=1 round_robin: 1676.435 ms
+saved /tmp/tmppsyyu_yh/seed1501-fresh-h40.json and /tmp/tmppsyyu_yh/seed1501-fresh-h40.csv
+checkpoint 1501 fresh H40: 24 runs
+transfer_hidden seed=1501 rep=0 round_robin: 455.178 ms
+transfer_hidden seed=1501 rep=0 feedback: 456.820 ms
+transfer_hidden seed=1501 rep=1 feedback: 454.489 ms
+transfer_hidden seed=1501 rep=1 round_robin: 454.346 ms
+saved /tmp/tmppsyyu_yh/seed1501-reused-h0.json and /tmp/tmppsyyu_yh/seed1501-reused-h0.csv
+checkpoint 1501 reused H0: 28 runs
+transfer_hidden seed=1501 rep=0 round_robin: 541.660 ms
+transfer_hidden seed=1501 rep=0 feedback: 546.219 ms
+transfer_hidden seed=1501 rep=1 feedback: 544.397 ms
+transfer_hidden seed=1501 rep=1 round_robin: 542.655 ms
+saved /tmp/tmppsyyu_yh/seed1501-fresh-h0.json and /tmp/tmppsyyu_yh/seed1501-fresh-h0.csv
+checkpoint 1501 fresh H0: 32 runs
+transfer_hidden seed=1502 rep=0 round_robin: 1553.025 ms
+transfer_hidden seed=1502 rep=0 feedback: 1534.688 ms
+transfer_hidden seed=1502 rep=1 round_robin: 1442.932 ms
+transfer_hidden seed=1502 rep=1 feedback: 1543.941 ms
+saved /tmp/tmppsyyu_yh/seed1502-fresh-h40.json and /tmp/tmppsyyu_yh/seed1502-fresh-h40.csv
+checkpoint 1502 fresh H40: 36 runs
+transfer_hidden seed=1502 rep=0 round_robin: 595.770 ms
+transfer_hidden seed=1502 rep=0 feedback: 484.487 ms
+transfer_hidden seed=1502 rep=1 round_robin: 597.664 ms
+transfer_hidden seed=1502 rep=1 feedback: 483.080 ms
+saved /tmp/tmppsyyu_yh/seed1502-reused-h0.json and /tmp/tmppsyyu_yh/seed1502-reused-h0.csv
+checkpoint 1502 reused H0: 40 runs
+transfer_hidden seed=1502 rep=0 round_robin: 696.575 ms
+transfer_hidden seed=1502 rep=0 feedback: 570.256 ms
+transfer_hidden seed=1502 rep=1 round_robin: 691.108 ms
+transfer_hidden seed=1502 rep=1 feedback: 569.455 ms
+saved /tmp/tmppsyyu_yh/seed1502-fresh-h0.json and /tmp/tmppsyyu_yh/seed1502-fresh-h0.csv
+checkpoint 1502 fresh H0: 44 runs
+transfer_hidden seed=1502 rep=0 round_robin: 738.998 ms
+transfer_hidden seed=1502 rep=0 feedback: 659.521 ms
+transfer_hidden seed=1502 rep=1 round_robin: 750.712 ms
+transfer_hidden seed=1502 rep=1 feedback: 651.015 ms
+saved /tmp/tmppsyyu_yh/seed1502-reused-h40.json and /tmp/tmppsyyu_yh/seed1502-reused-h40.csv
+checkpoint 1502 reused H40: 48 runs
+transfer_hidden seed=1503 rep=0 round_robin: 451.316 ms
+transfer_hidden seed=1503 rep=0 feedback: 521.599 ms
+transfer_hidden seed=1503 rep=1 round_robin: 449.120 ms
+transfer_hidden seed=1503 rep=1 feedback: 523.094 ms
+saved /tmp/tmppsyyu_yh/seed1503-reused-h0.json and /tmp/tmppsyyu_yh/seed1503-reused-h0.csv
+checkpoint 1503 reused H0: 52 runs
+transfer_hidden seed=1503 rep=0 round_robin: 538.423 ms
+transfer_hidden seed=1503 rep=0 feedback: 598.242 ms
+transfer_hidden seed=1503 rep=1 round_robin: 540.668 ms
+transfer_hidden seed=1503 rep=1 feedback: 606.192 ms
+saved /tmp/tmppsyyu_yh/seed1503-fresh-h0.json and /tmp/tmppsyyu_yh/seed1503-fresh-h0.csv
+checkpoint 1503 fresh H0: 56 runs
+transfer_hidden seed=1503 rep=0 round_robin: 653.032 ms
+transfer_hidden seed=1503 rep=0 feedback: 636.002 ms
+transfer_hidden seed=1503 rep=1 round_robin: 633.196 ms
+transfer_hidden seed=1503 rep=1 feedback: 650.030 ms
+saved /tmp/tmppsyyu_yh/seed1503-reused-h40.json and /tmp/tmppsyyu_yh/seed1503-reused-h40.csv
+checkpoint 1503 reused H40: 60 runs
+transfer_hidden seed=1503 rep=0 round_robin: 1366.183 ms
+transfer_hidden seed=1503 rep=0 feedback: 1468.197 ms
+transfer_hidden seed=1503 rep=1 round_robin: 1448.980 ms
+transfer_hidden seed=1503 rep=1 feedback: 1345.144 ms
+saved /tmp/tmppsyyu_yh/seed1503-fresh-h40.json and /tmp/tmppsyyu_yh/seed1503-fresh-h40.csv
+checkpoint 1503 fresh H40: 64 runs
+transfer_hidden seed=1504 rep=0 round_robin: 672.680 ms
+transfer_hidden seed=1504 rep=0 feedback: 615.231 ms
+transfer_hidden seed=1504 rep=1 round_robin: 667.493 ms
+transfer_hidden seed=1504 rep=1 feedback: 618.878 ms
+saved /tmp/tmppsyyu_yh/seed1504-fresh-h0.json and /tmp/tmppsyyu_yh/seed1504-fresh-h0.csv
+checkpoint 1504 fresh H0: 68 runs
+transfer_hidden seed=1504 rep=0 round_robin: 714.946 ms
+transfer_hidden seed=1504 rep=0 feedback: 646.968 ms
+transfer_hidden seed=1504 rep=1 round_robin: 735.795 ms
+transfer_hidden seed=1504 rep=1 feedback: 650.154 ms
+saved /tmp/tmppsyyu_yh/seed1504-reused-h40.json and /tmp/tmppsyyu_yh/seed1504-reused-h40.csv
+checkpoint 1504 reused H40: 72 runs
+transfer_hidden seed=1504 rep=0 round_robin: 1342.662 ms
+transfer_hidden seed=1504 rep=0 feedback: 1445.979 ms
+transfer_hidden seed=1504 rep=1 round_robin: 1347.822 ms
+transfer_hidden seed=1504 rep=1 feedback: 1348.853 ms
+saved /tmp/tmppsyyu_yh/seed1504-fresh-h40.json and /tmp/tmppsyyu_yh/seed1504-fresh-h40.csv
+checkpoint 1504 fresh H40: 76 runs
+transfer_hidden seed=1504 rep=0 round_robin: 592.465 ms
+transfer_hidden seed=1504 rep=0 feedback: 534.948 ms
+transfer_hidden seed=1504 rep=1 round_robin: 591.375 ms
+transfer_hidden seed=1504 rep=1 feedback: 532.501 ms
+saved /tmp/tmppsyyu_yh/seed1504-reused-h0.json and /tmp/tmppsyyu_yh/seed1504-reused-h0.csv
+checkpoint 1504 reused H0: 80 runs
+transfer_hidden seed=1505 rep=0 feedback: 660.765 ms
+transfer_hidden seed=1505 rep=0 round_robin: 736.769 ms
+transfer_hidden seed=1505 rep=1 round_robin: 736.084 ms
+transfer_hidden seed=1505 rep=1 feedback: 736.818 ms
+saved /tmp/tmppsyyu_yh/seed1505-reused-h40.json and /tmp/tmppsyyu_yh/seed1505-reused-h40.csv
+checkpoint 1505 reused H40: 84 runs
+transfer_hidden seed=1505 rep=0 feedback: 1738.354 ms
+transfer_hidden seed=1505 rep=0 round_robin: 1756.145 ms
+transfer_hidden seed=1505 rep=1 round_robin: 1441.091 ms
+transfer_hidden seed=1505 rep=1 feedback: 1355.053 ms
+saved /tmp/tmppsyyu_yh/seed1505-fresh-h40.json and /tmp/tmppsyyu_yh/seed1505-fresh-h40.csv
+checkpoint 1505 fresh H40: 88 runs
+transfer_hidden seed=1505 rep=0 feedback: 498.131 ms
+transfer_hidden seed=1505 rep=0 round_robin: 594.705 ms
+transfer_hidden seed=1505 rep=1 round_robin: 592.702 ms
+transfer_hidden seed=1505 rep=1 feedback: 498.094 ms
+saved /tmp/tmppsyyu_yh/seed1505-reused-h0.json and /tmp/tmppsyyu_yh/seed1505-reused-h0.csv
+checkpoint 1505 reused H0: 92 runs
+transfer_hidden seed=1505 rep=0 feedback: 590.350 ms
+transfer_hidden seed=1505 rep=0 round_robin: 670.659 ms
+transfer_hidden seed=1505 rep=1 round_robin: 689.205 ms
+transfer_hidden seed=1505 rep=1 feedback: 589.408 ms
+saved /tmp/tmppsyyu_yh/seed1505-fresh-h0.json and /tmp/tmppsyyu_yh/seed1505-fresh-h0.csv
+checkpoint 1505 fresh H0: 96 runs
+transfer_hidden seed=1506 rep=0 feedback: 1129.408 ms
+transfer_hidden seed=1506 rep=0 round_robin: 1376.358 ms
+transfer_hidden seed=1506 rep=1 feedback: 1335.026 ms
+transfer_hidden seed=1506 rep=1 round_robin: 1689.350 ms
+saved /tmp/tmppsyyu_yh/seed1506-fresh-h40.json and /tmp/tmppsyyu_yh/seed1506-fresh-h40.csv
+checkpoint 1506 fresh H40: 100 runs
+transfer_hidden seed=1506 rep=0 feedback: 459.199 ms
+transfer_hidden seed=1506 rep=0 round_robin: 592.107 ms
+transfer_hidden seed=1506 rep=1 feedback: 463.722 ms
+transfer_hidden seed=1506 rep=1 round_robin: 592.785 ms
+saved /tmp/tmppsyyu_yh/seed1506-reused-h0.json and /tmp/tmppsyyu_yh/seed1506-reused-h0.csv
+checkpoint 1506 reused H0: 104 runs
+transfer_hidden seed=1506 rep=0 feedback: 538.609 ms
+transfer_hidden seed=1506 rep=0 round_robin: 670.185 ms
+transfer_hidden seed=1506 rep=1 feedback: 539.012 ms
+transfer_hidden seed=1506 rep=1 round_robin: 678.882 ms
+saved /tmp/tmppsyyu_yh/seed1506-fresh-h0.json and /tmp/tmppsyyu_yh/seed1506-fresh-h0.csv
+checkpoint 1506 fresh H0: 108 runs
+transfer_hidden seed=1506 rep=0 feedback: 553.009 ms
+transfer_hidden seed=1506 rep=0 round_robin: 666.025 ms
+transfer_hidden seed=1506 rep=1 feedback: 631.905 ms
+transfer_hidden seed=1506 rep=1 round_robin: 678.269 ms
+saved /tmp/tmppsyyu_yh/seed1506-reused-h40.json and /tmp/tmppsyyu_yh/seed1506-reused-h40.csv
+checkpoint 1506 reused H40: 112 runs
+transfer_hidden seed=1507 rep=0 feedback: 509.848 ms
+transfer_hidden seed=1507 rep=0 round_robin: 598.259 ms
+transfer_hidden seed=1507 rep=1 feedback: 510.517 ms
+transfer_hidden seed=1507 rep=1 round_robin: 597.385 ms
+saved /tmp/tmppsyyu_yh/seed1507-reused-h0.json and /tmp/tmppsyyu_yh/seed1507-reused-h0.csv
+checkpoint 1507 reused H0: 116 runs
+transfer_hidden seed=1507 rep=0 feedback: 594.276 ms
+transfer_hidden seed=1507 rep=0 round_robin: 686.793 ms
+transfer_hidden seed=1507 rep=1 feedback: 593.393 ms
+transfer_hidden seed=1507 rep=1 round_robin: 678.015 ms
+saved /tmp/tmppsyyu_yh/seed1507-fresh-h0.json and /tmp/tmppsyyu_yh/seed1507-fresh-h0.csv
+checkpoint 1507 fresh H0: 120 runs
+transfer_hidden seed=1507 rep=0 feedback: 640.581 ms
+transfer_hidden seed=1507 rep=0 round_robin: 753.654 ms
+transfer_hidden seed=1507 rep=1 feedback: 643.992 ms
+transfer_hidden seed=1507 rep=1 round_robin: 742.671 ms
+saved /tmp/tmppsyyu_yh/seed1507-reused-h40.json and /tmp/tmppsyyu_yh/seed1507-reused-h40.csv
+checkpoint 1507 reused H40: 124 runs
+transfer_hidden seed=1507 rep=0 feedback: 1343.737 ms
+transfer_hidden seed=1507 rep=0 round_robin: 1447.781 ms
+transfer_hidden seed=1507 rep=1 feedback: 1547.730 ms
+transfer_hidden seed=1507 rep=1 round_robin: 1244.101 ms
+saved /tmp/tmppsyyu_yh/seed1507-fresh-h40.json and /tmp/tmppsyyu_yh/seed1507-fresh-h40.csv
+checkpoint 1507 fresh H40: 128 runs
+transfer_hidden seed=1508 rep=0 round_robin: 547.463 ms
+transfer_hidden seed=1508 rep=0 feedback: 543.371 ms
+transfer_hidden seed=1508 rep=1 feedback: 543.455 ms
+transfer_hidden seed=1508 rep=1 round_robin: 559.201 ms
+saved /tmp/tmppsyyu_yh/seed1508-fresh-h0.json and /tmp/tmppsyyu_yh/seed1508-fresh-h0.csv
+checkpoint 1508 fresh H0: 132 runs
+transfer_hidden seed=1508 rep=0 round_robin: 655.613 ms
+transfer_hidden seed=1508 rep=0 feedback: 562.871 ms
+transfer_hidden seed=1508 rep=1 feedback: 636.111 ms
+transfer_hidden seed=1508 rep=1 round_robin: 653.728 ms
+saved /tmp/tmppsyyu_yh/seed1508-reused-h40.json and /tmp/tmppsyyu_yh/seed1508-reused-h40.csv
+checkpoint 1508 reused H40: 136 runs
+transfer_hidden seed=1508 rep=0 round_robin: 1270.211 ms
+transfer_hidden seed=1508 rep=0 feedback: 1483.861 ms
+transfer_hidden seed=1508 rep=1 feedback: 1353.922 ms
+transfer_hidden seed=1508 rep=1 round_robin: 1684.850 ms
+saved /tmp/tmppsyyu_yh/seed1508-fresh-h40.json and /tmp/tmppsyyu_yh/seed1508-fresh-h40.csv
+checkpoint 1508 fresh H40: 140 runs
+transfer_hidden seed=1508 rep=0 round_robin: 457.241 ms
+transfer_hidden seed=1508 rep=0 feedback: 462.354 ms
+transfer_hidden seed=1508 rep=1 feedback: 457.781 ms
+transfer_hidden seed=1508 rep=1 round_robin: 456.485 ms
+saved /tmp/tmppsyyu_yh/seed1508-reused-h0.json and /tmp/tmppsyyu_yh/seed1508-reused-h0.csv
+checkpoint 1508 reused H0: 144 runs
+transfer_hidden seed=1509 rep=0 round_robin: 561.117 ms
+transfer_hidden seed=1509 rep=0 feedback: 632.444 ms
+transfer_hidden seed=1509 rep=1 feedback: 656.845 ms
+transfer_hidden seed=1509 rep=1 round_robin: 568.231 ms
+saved /tmp/tmppsyyu_yh/seed1509-reused-h40.json and /tmp/tmppsyyu_yh/seed1509-reused-h40.csv
+checkpoint 1509 reused H40: 148 runs
+transfer_hidden seed=1509 rep=0 round_robin: 1544.107 ms
+transfer_hidden seed=1509 rep=0 feedback: 1647.595 ms
+transfer_hidden seed=1509 rep=1 feedback: 1548.124 ms
+transfer_hidden seed=1509 rep=1 round_robin: 1350.479 ms
+saved /tmp/tmppsyyu_yh/seed1509-fresh-h40.json and /tmp/tmppsyyu_yh/seed1509-fresh-h40.csv
+checkpoint 1509 fresh H40: 152 runs
+transfer_hidden seed=1509 rep=0 round_robin: 458.795 ms
+transfer_hidden seed=1509 rep=0 feedback: 532.679 ms
+transfer_hidden seed=1509 rep=1 feedback: 531.266 ms
+transfer_hidden seed=1509 rep=1 round_robin: 459.245 ms
+saved /tmp/tmppsyyu_yh/seed1509-reused-h0.json and /tmp/tmppsyyu_yh/seed1509-reused-h0.csv
+checkpoint 1509 reused H0: 156 runs
+transfer_hidden seed=1509 rep=0 round_robin: 539.465 ms
+transfer_hidden seed=1509 rep=0 feedback: 620.838 ms
+transfer_hidden seed=1509 rep=1 feedback: 619.517 ms
+transfer_hidden seed=1509 rep=1 round_robin: 542.976 ms
+saved /tmp/tmppsyyu_yh/seed1509-fresh-h0.json and /tmp/tmppsyyu_yh/seed1509-fresh-h0.csv
+checkpoint 1509 fresh H0: 160 runs
+transfer_hidden seed=1510 rep=0 round_robin: 1529.035 ms
+transfer_hidden seed=1510 rep=0 feedback: 1459.042 ms
+transfer_hidden seed=1510 rep=1 feedback: 1551.082 ms
+transfer_hidden seed=1510 rep=1 round_robin: 1174.626 ms
+saved /tmp/tmppsyyu_yh/seed1510-fresh-h40.json and /tmp/tmppsyyu_yh/seed1510-fresh-h40.csv
+checkpoint 1510 fresh H40: 164 runs
+transfer_hidden seed=1510 rep=0 round_robin: 454.511 ms
+transfer_hidden seed=1510 rep=0 feedback: 454.094 ms
+transfer_hidden seed=1510 rep=1 feedback: 454.892 ms
+transfer_hidden seed=1510 rep=1 round_robin: 455.567 ms
+saved /tmp/tmppsyyu_yh/seed1510-reused-h0.json and /tmp/tmppsyyu_yh/seed1510-reused-h0.csv
+checkpoint 1510 reused H0: 168 runs
+transfer_hidden seed=1510 rep=0 round_robin: 544.100 ms
+transfer_hidden seed=1510 rep=0 feedback: 553.448 ms
+transfer_hidden seed=1510 rep=1 feedback: 549.008 ms
+transfer_hidden seed=1510 rep=1 round_robin: 547.073 ms
+saved /tmp/tmppsyyu_yh/seed1510-fresh-h0.json and /tmp/tmppsyyu_yh/seed1510-fresh-h0.csv
+checkpoint 1510 fresh H0: 172 runs
+transfer_hidden seed=1510 rep=0 round_robin: 620.176 ms
+transfer_hidden seed=1510 rep=0 feedback: 636.866 ms
+transfer_hidden seed=1510 rep=1 feedback: 573.542 ms
+transfer_hidden seed=1510 rep=1 round_robin: 573.582 ms
+saved /tmp/tmppsyyu_yh/seed1510-reused-h40.json and /tmp/tmppsyyu_yh/seed1510-reused-h40.csv
+checkpoint 1510 reused H40: 176 runs
+transfer_hidden seed=1511 rep=0 round_robin: 604.033 ms
+transfer_hidden seed=1511 rep=0 feedback: 502.868 ms
+transfer_hidden seed=1511 rep=1 feedback: 502.384 ms
+transfer_hidden seed=1511 rep=1 round_robin: 604.795 ms
+saved /tmp/tmppsyyu_yh/seed1511-reused-h0.json and /tmp/tmppsyyu_yh/seed1511-reused-h0.csv
+checkpoint 1511 reused H0: 180 runs
+transfer_hidden seed=1511 rep=0 round_robin: 681.365 ms
+transfer_hidden seed=1511 rep=0 feedback: 603.978 ms
+transfer_hidden seed=1511 rep=1 feedback: 598.722 ms
+transfer_hidden seed=1511 rep=1 round_robin: 682.287 ms
+saved /tmp/tmppsyyu_yh/seed1511-fresh-h0.json and /tmp/tmppsyyu_yh/seed1511-fresh-h0.csv
+checkpoint 1511 fresh H0: 184 runs
+transfer_hidden seed=1511 rep=0 round_robin: 647.972 ms
+transfer_hidden seed=1511 rep=0 feedback: 643.686 ms
+transfer_hidden seed=1511 rep=1 feedback: 642.772 ms
+transfer_hidden seed=1511 rep=1 round_robin: 745.787 ms
+saved /tmp/tmppsyyu_yh/seed1511-reused-h40.json and /tmp/tmppsyyu_yh/seed1511-reused-h40.csv
+checkpoint 1511 reused H40: 188 runs
+transfer_hidden seed=1511 rep=0 round_robin: 1260.814 ms
+transfer_hidden seed=1511 rep=0 feedback: 1629.058 ms
+transfer_hidden seed=1511 rep=1 feedback: 1375.951 ms
+transfer_hidden seed=1511 rep=1 round_robin: 1289.615 ms
+saved /tmp/tmppsyyu_yh/seed1511-fresh-h40.json and /tmp/tmppsyyu_yh/seed1511-fresh-h40.csv
+checkpoint 1511 fresh H40: 192 runs
+saved results/factorial-v2.json and results/factorial-v2.csv
+{
+  "median": 5.654835571408528,
+  "bootstrap_95pct_ci": [
+    -3.9089637128513997,
+    13.140240446788093
+  ],
+  "positive_by_protocol": false
+}
+{
+  "sample_interval_s": 1,
+  "samples": {
+    "0": {
+      "count": 822,
+      "mean_sm_pct": 11.690997566909976,
+      "median_sm_pct": 0.0,
+      "max_sm_pct": 100,
+      "pct_samples_ge_70": 8.150851581508515,
+      "pct_samples_zero": 71.77615571776155
+    },
+    "1": {
+      "count": 822,
+      "mean_sm_pct": 11.074209245742093,
+      "median_sm_pct": 0.0,
+      "max_sm_pct": 100,
+      "pct_samples_ge_70": 8.394160583941606,
+      "pct_samples_zero": 73.96593673965937
+    }
+  },
+  "cuda_event_fraction": {
+    "0": {
+      "median_pct": 59.85581521260225,
+      "min_pct": 13.427215049445927,
+      "max_pct": 92.74424618096718
+    },
+    "1": {
+      "median_pct": 70.04948475988519,
+      "min_pct": 17.39600690198495,
+      "max_pct": 90.92787379315774
+    }
+  },
+  "run_count": 192,
+  "task_count": 2304
+}
+{
+  "complete_runs": 192,
+  "complete_tasks": 2304,
+  "nsight_traces": 0,
+  "total_bytes": 1341103
+}
+Factorial campaign complete: 192 runs, 2304 tasks. Export every result before stopping the pod.

@@ -1,0 +1,3 @@
+workload,mode,task_count,gemm_repeats,host_load_workers,fixed_input_scale,seed,repetition,order,policy,makespan_ms,dispatch_ms,gpu0_tasks,gpu1_tasks,gpu0_n3,gpu1_n3,gpu0_event_ms,gpu1_event_ms,gpu0_h2d_ms,gpu1_h2d_ms,input_prepare_ms_median,host_task_ms_median,probe_route,probe_long_gpu0,probe_long_gpu1,probe_decision_ms
+transfer_hidden,host_to_device,12,1,0,1.0,1499,0,0,feedback,552.213134,0.799793,7,5,481036337152,343597383680,407.2971134185791,370.38783073425293,43.768832206726074,32.08400011062622,3.161743,29.318392,,,,
+transfer_hidden,host_to_device,12,1,0,1.0,1499,0,1,round_robin,675.466494,0.636444,6,6,412316860416,412316860416,250.85980415344238,530.3010158538818,39.664448261260986,40.298304080963135,2.747687,29.680984000000002,,,,
