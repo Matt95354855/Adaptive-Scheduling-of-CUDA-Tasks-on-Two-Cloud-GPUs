@@ -13,10 +13,14 @@ Les quatre blocs ont été mesurés avec des contrôles de somme valides. Les fi
 
 ## À reprendre après la pause, par ordre logique
 
-1. **Interaction CPU × durée de vie des entrées.** Exécuter le [plan factoriel préenregistré](factorial-input-protocol-2026-10-24.md) H0/H40 × entrées épinglées fraîches/réutilisées : 192 runs attendus. Il sépare mieux la contention CPU du coût d'allocation, sans supprimer la limite de données numériques différentes entre modes.
+1. **Interaction CPU × durée de vie des entrées.** Exécuter le [plan factoriel amendé avant mesure](factorial-input-protocol-2026-10-24.md) H0/H40 × entrées épinglées fraîches/réutilisées : 192 runs attendus. La valeur numérique des matrices est désormais identique entre modes ; les autres limites d'une charge synthétique demeurent.
 2. **Occupation end-to-end.** Conserver les deux workers CUDA et la calibration entre lots ; chronométrer du début de la requête à la fin, et échantillonner l'occupation SM tout au long du processus. La charge dense montre que la fenêtre du lot peut être saturée alors que le pod facturé ne l'est pas.
 3. **Profil Nsight ciblé.** Capturer séparément un run `probe_feedback` et un run à charge dense, hors statistiques prospectives ; exporter les rapports CUDA/NVTX et sauvegarder la trace binaire avant l'arrêt d'un futur pod.
 4. **Nouvelle politique en ligne.** Construire une règle qui exploite les coûts observés sans pause globale de quatre tâches, la préenregistrer, puis la tester sur des seeds inédites. Le choix `probe_switch` actuel n'a pas amélioré le feedback.
 5. **Validité externe.** Répéter sur une autre charge applicative, puis une topologie GPU et un type d'instance différents. Les conclusions présentes concernent surtout une charge synthétique de tâches indépendantes.
 
 Le pod `zgi4mo43z7dkw9` a été arrêté après sauvegarde intégrale des résultats terminés. L'interface RunPod affichait alors **0,00 $/h** et un solde de **7,13 $**, contre **7,85 $** au lancement du pod, soit environ **0,72 $** dépensés sur la limite de 2 $. Le plan factoriel et la nouvelle trace Nsight n'ont pas été exécutés pendant cette session ; ils ne doivent pas être présentés comme des résultats.
+
+**Préparation du 29 octobre, sans location :** le [plan de campagne complet](campaign-ready-2026-10-29.md), le code, les contrôles et les scripts d'export sont prêts. L'amendement pré-mesure fixe la même valeur numérique des entrées fraîches et réutilisées. Le statut expérimental du plan factoriel reste « à exécuter ».
+
+Le [contrôle secondaire des workers persistants](persistent-pool-protocol-2026-10-29.md) est aussi préenregistré. Il sera tenté après le factoriel et les profils Nsight uniquement si le plafond de 2 $ permet encore son exécution et l'export intégral. Aucune donnée GPU de ce contrôle n'a été recueillie.
