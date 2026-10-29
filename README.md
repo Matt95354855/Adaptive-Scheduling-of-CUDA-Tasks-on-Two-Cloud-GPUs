@@ -16,6 +16,8 @@ Continuous GPU sampling also explains why an active pod can show 0% between runs
 - [Sustained-utilization protocol](docs/sustained-utilization-protocol-2026-10-24.md) and [results](docs/sustained-utilization-results-2026-10-24.md)
 - [Two new visual analyses: whole-campaign GPU occupancy and probe decisions](docs/new-visual-observations-2026-10-24.md)
 - [Next factorial protocol](docs/factorial-input-protocol-2026-10-24.md) and [current research checklist](docs/research-status-2026-10-24.md)
+- [29 October pre-rental campaign plan: exact grid, validation, Nsight, budget and stop rules](docs/campaign-ready-2026-10-29.md)
+- [Predeclared persistent-worker secondary control](docs/persistent-pool-protocol-2026-10-29.md)
 
 ## Host contention and independent replication, 23 October 2026
 
